@@ -83,3 +83,9 @@ python -m waitress --listen=0.0.0.0:5501 wsgi:app
 | `FLASK_DEBUG` | `0` | Set `0` for production, `1` for development |
 | `DATABASE_PATH` | `ecocampus.db` | Custom location for the SQLite database |
 | `CORS_ORIGINS` | `*` | Allowed CORS origins for external API access |
+| `BOOTSTRAP_ADMIN_USERNAME` | unset | Username for the first administrator account |
+| `BOOTSTRAP_ADMIN_PASSWORD` | unset | Bootstrap administrator password; 1-8 characters |
+| `SESSION_SECRET_KEY` | DB-generated | Stable session-signing secret; set explicitly for multiple application instances |
+| `SESSION_COOKIE_SECURE` | `0` | Set to `1` when serving over HTTPS |
+
+Before starting the service, set `BOOTSTRAP_ADMIN_USERNAME` and `BOOTSTRAP_ADMIN_PASSWORD` in the deployment environment to create the first administrator. New passwords must be 1-8 characters; this short password limit is less secure, so use it only on a trusted/private deployment. Existing accounts with longer passwords can still sign in. Store credentials outside source control; there is no default administrator password. Open `/login` to register standard user accounts. Administrators can assign department managers in **Users & Roles**. If bootstrap credentials are omitted, registration still works but no account has administrator privileges. The IoT simulator requires an administrator session; no API keys are used. For multi-instance deployments, persist the shared database and configure the same `SESSION_SECRET_KEY` on every instance.

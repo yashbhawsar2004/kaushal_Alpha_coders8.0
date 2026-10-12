@@ -38,9 +38,18 @@ body {
 }
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; border: 0; }
+.auth-gate { min-height:100vh; display:grid; place-items:center; padding:24px; background:var(--bg); }
+.auth-card { width:min(440px,100%); padding:30px; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface); box-shadow:var(--shadow-lg); }
+.auth-card h1 { margin:12px 0 6px; font-size:24px; }
+.auth-card p { color:var(--muted); font-size:13px; line-height:1.6; margin-bottom:18px; }
+.auth-card .field { margin:12px 0; }
+.auth-switch { background:none; color:var(--pri); font-weight:700; padding:12px 0 0; }
+.user-chip { display:inline-flex; align-items:center; gap:8px; padding:7px 10px; border:1px solid var(--line); border-radius:20px; color:var(--text2); font-size:12px; }
+.nav-section-label { margin:14px 12px 4px; color:rgba(255,255,255,.5); font-size:10px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; }
+[hidden] { display:none !important; }
 
 /* ── App Shell ─────────────────────────────────────────────────── */
-.app { display: grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: 100vh; }
+.app { display: grid; grid-template-columns: var(--sidebar-w) minmax(0, 1fr); min-height: 100vh; }
 
 /* ── Sidebar ───────────────────────────────────────────────────── */
 .side {
@@ -83,7 +92,7 @@ button { cursor: pointer; border: 0; }
 @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
 
 /* ── Main Canvas ───────────────────────────────────────────────── */
-.main { padding: 30px 34px; max-width: 1440px; width: 100%; margin: 0 auto; }
+.main { padding: 30px 34px; max-width: 1440px; width: 100%; min-width: 0; margin: 0 auto; }
 
 /* ── Top Bar ───────────────────────────────────────────────────── */
 .topbar {
@@ -181,15 +190,16 @@ button { cursor: pointer; border: 0; }
 .stat-value small { font-size: 13px; font-weight: 500; color: var(--muted); }
 
 /* ── Grid Layouts ──────────────────────────────────────────────── */
-.grid-2 { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; margin-bottom: 18px; }
-.grid-lower { display: grid; grid-template-columns: 1.25fr 1fr; gap: 18px; }
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 18px; margin-bottom: 18px; }
+.grid-lower { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; }
+.grid-2 > *, .grid-lower > *, .stats > *, .issues-grid > *, .insights-grid > *, .challenges > * { min-width:0; }
 
 /* ── Chart ─────────────────────────────────────────────────────── */
 .chart-area {
   height: 170px; display: flex; align-items: flex-end; gap: 10px;
   border-bottom: 2px solid var(--line); padding-top: 10px;
 }
-.chart-col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px; height: 100%; }
+.chart-col { flex: 1; min-width:0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px; height: 100%; }
 .chart-bar {
   width: 70%; max-width: 32px; border-radius: 6px 6px 2px 2px;
   background: linear-gradient(180deg, var(--pri), var(--accent2));
@@ -209,6 +219,30 @@ button { cursor: pointer; border: 0; }
 .resource-row:last-child { border-bottom: 0; }
 .progress-bar { height: 6px; background: var(--line); border-radius: 10px; margin-top: 6px; overflow: hidden; }
 .progress-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, var(--pri), var(--accent2)); transition: width 1s; }
+.monitor-controls { display:flex; gap:10px; align-items:end; flex-wrap:wrap; margin:16px 0; }
+.monitor-controls .field { min-width:145px; }
+.monitor-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:16px; }
+.monitor-stat { padding:14px; border:1px solid var(--line); border-radius:var(--radius-sm); background:var(--bg); }
+.monitor-stat-label { font-size:11px; color:var(--muted); }
+.monitor-stat-value { font-size:20px; font-weight:800; margin-top:4px; }
+.monitor-status { display:inline-flex; padding:5px 9px; border-radius:20px; font-size:11px; font-weight:800; white-space:nowrap; }
+.status-over-consumption { color:#991b1b; background:#fee2e2; }
+.status-within-limit { color:#166534; background:#dcfce7; }
+.status-under-usage { color:#1d4ed8; background:#dbeafe; }
+.status-missing-data { color:var(--muted); background:var(--line); }
+[data-theme="dark"] .status-over-consumption { color:#fecaca; background:#451a1a; }
+[data-theme="dark"] .status-within-limit { color:#bbf7d0; background:#14351f; }
+[data-theme="dark"] .status-under-usage { color:#bfdbfe; background:#172554; }
+.monitor-bar { min-width:95px; height:7px; background:var(--line); border-radius:8px; overflow:hidden; }
+.monitor-bar > span { display:block; height:100%; background:var(--pri); }
+.monitor-alert { padding:12px; border-left:4px solid var(--danger); background:var(--bg); border-radius:8px; margin:8px 0; }
+.monitor-alert.under { border-color:var(--info); }
+.monitor-editor { margin-top:16px; border-top:1px solid var(--line); padding-top:14px; }
+.monitor-editor summary { cursor:pointer; font-weight:700; font-size:13px; }
+.monitor-note { color:var(--muted); font-size:11px; line-height:1.5; margin-top:8px; }
+.monitor-chart { min-height:175px; }
+.monitor-sparkline { display:flex; align-items:end; gap:2px; width:82px; height:28px; }
+.monitor-sparkline span { flex:1; min-width:3px; border-radius:2px 2px 0 0; background:var(--pri); }
 
 /* ── Leaderboard ───────────────────────────────────────────────── */
 .leaderboard-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
@@ -307,7 +341,7 @@ button { cursor: pointer; border: 0; }
 .filter-input { padding: 8px 12px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-size: 13px; background: var(--surface); color: var(--text); }
 
 /* ── Table ─────────────────────────────────────────────────────── */
-.table-wrap { overflow-x: auto; }
+.table-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 table { border-collapse: collapse; width: 100%; font-size: 13px; }
 th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
 th { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
@@ -329,15 +363,68 @@ tbody tr:hover { background: rgba(74,222,128,.05); }
 .toast.show { transform: translateY(0); opacity: 1; }
 
 /* ── Mobile & Print ────────────────────────────────────────────── */
-.mobile-toggle { display: none; position: fixed; top: 14px; left: 14px; z-index: 110; width: 38px; height: 38px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); place-items: center; font-size: 18px; }
+.mobile-toggle { display: none; position: fixed; top: 14px; left: 14px; z-index: 120; width: 42px; height: 42px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); place-items: center; font-size: 18px; color:var(--text); box-shadow:var(--shadow); }
+.mobile-backdrop { display:none; }
 @media (max-width: 960px) {
-  .app { grid-template-columns: 1fr; }
+  .app { grid-template-columns: minmax(0, 1fr); }
   .mobile-toggle { display: grid; }
-  .side { position: fixed; transform: translateX(-100%); }
+  .side { position: fixed; inset:0 auto 0 0; width:min(var(--sidebar-w), 86vw); height:100dvh; transform: translateX(-105%); }
   .side.open { transform: translateX(0); }
-  .main { padding: 56px 16px 24px; }
-  .stats { grid-template-columns: 1fr 1fr; }
-  .grid-2, .grid-lower, .issues-grid, .insights-grid, .challenges { grid-template-columns: 1fr; }
+  .mobile-backdrop.show { display:block; position:fixed; inset:0; z-index:99; background:rgba(2,12,6,.48); }
+  .main { padding: 70px 20px 24px; }
+  .stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .monitor-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .grid-2, .grid-lower, .issues-grid, .insights-grid, .challenges { grid-template-columns: minmax(0,1fr); }
+}
+
+@media (max-width: 600px) {
+  .main { padding:68px 14px 22px; }
+  .topbar { align-items:flex-start; margin-bottom:18px; }
+  .topbar-left { padding-left:48px; min-width:0; }
+  .topbar-left h1 { font-size:22px; line-height:1.2; }
+  .topbar-left .subtitle { font-size:12px; line-height:1.45; }
+  .topbar-right { width:100%; justify-content:flex-end; }
+  .hero { padding:22px 18px; }
+  .hero h2 { font-size:20px; }
+  .hero p { font-size:13px; }
+  .hero-cta { display:grid; grid-template-columns:1fr 1fr; }
+  .hero-cta .btn { justify-content:center; min-height:42px; padding:8px 10px; font-size:12px; }
+  .card { padding:17px; }
+  .card-header-flex { align-items:flex-start; gap:10px; }
+  .card-header-flex > :first-child { min-width:0; }
+  .card h3 { overflow-wrap:anywhere; }
+  .stats { gap:10px; }
+  .stats .card { padding:15px; }
+  .stat-value { font-size:23px; overflow-wrap:anywhere; }
+  .monitor-stats { gap:8px; }
+  .monitor-stat { padding:11px; min-width:0; }
+  .monitor-stat-value { font-size:17px; overflow-wrap:anywhere; }
+  .monitor-controls { align-items:stretch; }
+  .monitor-controls .field { flex:1 1 145px; min-width:0; }
+  .monitor-controls select { width:100%; max-width:100%; }
+  .form-grid { grid-template-columns:minmax(0,1fr); gap:11px; }
+  .field.full { grid-column:auto; }
+  .filter-bar { align-items:stretch; }
+  .filter-bar > * { min-width:0; flex:1 1 100%; }
+  .filter-input { max-width:100%; }
+  .leader-item { align-items:flex-start; gap:10px; padding:12px; }
+  .leader-info { min-width:0; }
+  .leader-name { overflow-wrap:anywhere; }
+  .leader-points { min-width:80px; }
+  .leader-pts-val { font-size:15px; }
+  .issue-header { flex-wrap:wrap; }
+  .issue-actions .btn { min-height:38px; }
+  .toast { left:14px; right:14px; bottom:14px; text-align:center; }
+  th, td { padding:10px 11px; }
+}
+
+@media (max-width: 380px) {
+  .main { padding-right:10px; padding-left:10px; }
+  .hero-cta { grid-template-columns:1fr; }
+  .stats { grid-template-columns:1fr; }
+  .monitor-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .monitor-stat-label { overflow-wrap:anywhere; }
+  .card { padding:14px; }
 }
 
 @media print {
@@ -351,28 +438,66 @@ tbody tr:hover { background: rgba(74,222,128,.05); }
 </head>
 <body>
 
-<button class="mobile-toggle" id="menuToggle">☰</button>
+<section class="auth-gate" id="authGate" aria-labelledby="authTitle">
+  <div class="auth-card">
+    <div class="brand-icon">🌿</div>
+    <h1 id="authTitle">Welcome to EcoCampus</h1>
+    <p id="authDescription">Sign in to access your sustainability dashboard.</p>
+    <form id="loginForm">
+      <div class="field"><label for="loginUsername">Username</label><input id="loginUsername" autocomplete="username" required maxlength="40"></div>
+      <div class="field"><label for="loginPassword">Password</label><input id="loginPassword" type="password" autocomplete="current-password" required maxlength="256"></div>
+      <button class="btn btn-primary" type="submit" style="width:100%;margin-top:8px">Sign in</button>
+    </form>
+    <form id="registerForm" hidden>
+      <div class="field"><label for="registerName">Display name</label><input id="registerName" autocomplete="name" required maxlength="80"></div>
+      <div class="field"><label for="registerUsername">Username</label><input id="registerUsername" autocomplete="username" required minlength="3" maxlength="40" pattern="[A-Za-z0-9_.-]+"></div>
+      <div class="field"><label for="registerPassword">Password (1–8 characters)</label><input id="registerPassword" type="password" autocomplete="new-password" required minlength="1" maxlength="8"></div>
+      <button class="btn btn-primary" type="submit" style="width:100%;margin-top:8px">Create user account</button>
+    </form>
+    <button class="auth-switch" id="authModeToggle" type="button">Create a user account</button>
+    <p id="authNotice" role="status" aria-live="polite" style="margin:10px 0 0"></p>
+  </div>
+</section>
 
-<div class="app">
+<button class="mobile-toggle" id="menuToggle" type="button" aria-label="Open navigation menu" aria-controls="sidebar" aria-expanded="false">☰</button>
+<button class="mobile-backdrop" id="menuBackdrop" type="button" aria-label="Close navigation menu"></button>
+
+<div class="app" id="appShell" style="display:none">
   <!-- ── Sidebar ──────────────────────────────────────── -->
   <aside class="side" id="sidebar">
     <div class="brand">
       <div class="brand-icon">🌿</div>
       <div class="brand-text">
         <h1>EcoCampus</h1>
-        <small>SUSTAINABILITY HUB</small>
+        <small id="panelName">SUSTAINABILITY HUB</small>
       </div>
     </div>
-    <nav class="nav">
+    <nav class="nav" id="userNav">
       <button class="nav-btn active" data-page="dashboard"><span class="nav-icon">📊</span> Overview</button>
       <button class="nav-btn" data-page="leaderboard"><span class="nav-icon">🏆</span> Leaderboard</button>
       <button class="nav-btn" data-page="issues"><span class="nav-icon">⚠️</span> Incident Reports</button>
       <button class="nav-btn" data-page="insights"><span class="nav-icon">🤖</span> AI Eco-Advisor <span id="alertsBadge" style="display:none; margin-left:auto; background:#ef4444; color:#fff; font-size:10px; font-weight:700; padding:1px 6px; border-radius:10px;">0</span></button>
       <button class="nav-btn" data-page="log"><span class="nav-icon">➕</span> Log Resources</button>
-      <button class="nav-btn" data-page="records"><span class="nav-icon">📋</span> Activity Records</button>
+      <button class="nav-btn" data-page="records"><span class="nav-icon">📋</span> My Activity</button>
       <button class="nav-btn" data-page="actions"><span class="nav-icon">🎯</span> Green Actions</button>
     </nav>
+    <nav class="nav" id="adminNav" hidden>
+      <div class="nav-section-label">University administration</div>
+      <button class="nav-btn active" data-page="dashboard"><span class="nav-icon">📊</span> University Overview</button>
+      <button class="nav-btn" data-admin-monitor><span class="nav-icon">🎚️</span> Consumption &amp; Limits</button>
+      <button class="nav-btn" data-page="leaderboard"><span class="nav-icon">🏆</span> Sustainability Rankings</button>
+      <button class="nav-btn" data-page="issues"><span class="nav-icon">⚠️</span> Incident Management</button>
+      <button class="nav-btn" data-page="insights"><span class="nav-icon">🤖</span> University Eco-Advisor</button>
+      <button class="nav-btn" data-page="log"><span class="nav-icon">➕</span> Log Resources</button>
+      <button class="nav-btn" data-page="records"><span class="nav-icon">📋</span> Resource Records &amp; Export</button>
+      <button class="nav-btn" data-page="actions"><span class="nav-icon">🎯</span> Green Actions</button>
+      <div class="nav-section-label">Access and accountability</div>
+      <button class="nav-btn" data-page="users"><span class="nav-icon">👥</span> Users &amp; Roles</button>
+      <button class="nav-btn" data-page="audit"><span class="nav-icon">🧾</span> Audit Log</button>
+    </nav>
     <div class="side-footer">
+      <div class="user-chip" style="margin-bottom:12px"><span id="profileName">User</span><span id="profileRole">User</span></div>
+      <button class="nav-btn" id="logoutButton" type="button" style="width:100%">↪ Sign out</button>
       <div class="eco-badge">
         <span class="dot"></span>
         <span id="entryCount">0 entries recorded</span>
@@ -389,9 +514,9 @@ tbody tr:hover { background: rgba(74,222,128,.05); }
         <div class="subtitle" id="subtitle">Live campus sustainability metrics & audits.</div>
       </div>
       <div class="topbar-right">
-        <button class="btn btn-ghost" id="simulateIot" title="Simulate a real-time smart meter reading ping">📡 IoT Ping</button>
-        <button class="btn btn-ghost" id="printReport" title="Generate printable PDF report">📄 Print / PDF</button>
-        <button class="btn btn-ghost" id="export">↓ Export CSV</button>
+        <button class="btn btn-ghost" id="simulateIot" data-role="admin" hidden title="Simulate a real-time smart meter reading ping">📡 IoT Ping</button>
+        <button class="btn btn-ghost" id="printReport" data-role="admin" hidden title="Generate printable PDF report">📄 Print / PDF</button>
+        <button class="btn btn-ghost" id="export" data-role="admin" hidden>↓ Export CSV</button>
         <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
       </div>
     </header>
@@ -426,6 +551,93 @@ tbody tr:hover { background: rgba(74,222,128,.05); }
         </div>
         <div id="dashboardAlertsList" style="display: flex; flex-direction: column; gap: 8px;"></div>
       </div>
+
+      <section class="card" aria-labelledby="monitoringTitle" style="margin-bottom:20px">
+        <div class="card-header-flex">
+          <div>
+            <h3 id="monitoringTitle">University Resource Monitoring</h3>
+            <p class="card-desc" id="monitorAsOf">Actuals and limits are based on the latest available period.</p>
+          </div>
+          <span class="monitor-status status-missing-data" id="monitorStatus">Loading</span>
+        </div>
+        <div class="monitor-controls">
+          <div class="field">
+            <label for="monitorPeriod">Analysis period</label>
+            <select id="monitorPeriod" class="filter-input">
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="monitorResource">Resource</label>
+            <select id="monitorResource" class="filter-input">
+              <option value="electricity">Electricity</option>
+              <option value="water">Water</option>
+              <option value="paper">Paper</option>
+              <option value="waste">Waste recycled</option>
+              <option value="generalWaste">General waste</option>
+              <option value="all">Resource comparison</option>
+            </select>
+          </div>
+        </div>
+        <div class="monitor-stats">
+          <div class="monitor-stat"><div class="monitor-stat-label">University total · selected period</div><div class="monitor-stat-value" id="monitorTotal">—</div></div>
+          <div class="monitor-stat"><div class="monitor-stat-label">Average university consumption / selected period</div><div class="monitor-stat-value" id="monitorAverage">—</div><div class="monitor-note" id="monitorDailyAverage"></div></div>
+          <div class="monitor-stat"><div class="monitor-stat-label">University limit · utilization</div><div class="monitor-stat-value" id="monitorLimit">—</div></div>
+          <div class="monitor-stat"><div class="monitor-stat-label">Average consumption / building</div><div class="monitor-stat-value" id="monitorPerBuilding">—</div></div>
+        </div>
+        <p class="monitor-note" id="monitorQuality"></p>
+
+        <div class="grid-2" style="margin-top:16px">
+          <div>
+            <h3 style="font-size:14px">University consumption trend</h3>
+            <p class="card-desc">Total readings by day, week, or month; gaps are not treated as measured zero.</p>
+            <div class="chart-area monitor-chart" id="monitorTrend"></div>
+          </div>
+          <div>
+            <h3 style="font-size:14px">Resource-wise totals</h3>
+            <p class="card-desc">Each resource retains its own unit and latest available period.</p>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Resource</th><th>Total</th><th>Average</th><th>Limit</th><th>Status</th></tr></thead>
+                <tbody id="resourceComparison"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="font-size:14px; margin:18px 0 4px">Building-wise consumption</h3>
+        <p class="card-desc">Difference is actual minus historical average; missing/outdated readings are called out.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Building</th><th>Department</th><th>Actual</th><th>Average</th><th>Limit</th><th>Limit used</th><th>Difference</th><th>Trend</th><th>Status</th><th>Data quality</th></tr></thead>
+            <tbody id="buildingMonitoring"></tbody>
+          </table>
+        </div>
+        <h3 style="font-size:14px; margin:18px 0 4px">Department-wise consumption</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Department</th><th>Actual</th><th>Average</th><th>Limit</th><th>Limit used</th><th>Trend</th><th>Status</th><th>Data quality</th></tr></thead>
+            <tbody id="departmentMonitoring"></tbody>
+          </table>
+        </div>
+        <div id="monitorAlerts" style="margin-top:14px"></div>
+
+        <details class="monitor-editor">
+          <summary>Administrator: configure a consumption limit</summary>
+          <p class="monitor-note">Only signed-in administrators can change official limits. Limit changes are recorded in the administrative audit log.</p>
+          <form id="limitForm">
+            <div class="form-grid">
+              <div class="field"><label for="limitScope">Apply limit to</label><select id="limitScope"><option value="building">Building</option><option value="department">Department</option><option value="university">University</option></select></div>
+              <div class="field"><label for="limitScopeName">Building / department name</label><input id="limitScopeName" maxlength="100" placeholder="Exact name shown in the dashboard"></div>
+              <div class="field"><label id="limitAmountLabel" for="limitAmount">Maximum consumption for selected period</label><input id="limitAmount" type="number" min="0.001" step="any" required></div>
+              <div class="field"><label for="underUsagePercent">Under-usage threshold (% of historical average)</label><input id="underUsagePercent" type="number" min="0" max="100" value="50" required></div>
+            </div>
+            <div style="margin-top:12px"><button class="btn btn-primary" type="submit">Save limit</button></div>
+          </form>
+        </details>
+      </section>
 
       <div class="stats">
         <div class="card stat-card">
@@ -542,6 +754,10 @@ tbody tr:hover { background: rgba(74,222,128,.05); }
               <label for="issueArea">Campus Location</label>
               <input id="issueArea" placeholder="e.g. Science Block, Room 204" required>
             </div>
+            <div class="field" id="issueDepartmentField" hidden>
+              <label for="issueDepartment">Department</label>
+              <input id="issueDepartment" maxlength="100" placeholder="Department responsible for this location">
+            </div>
             <div class="field">
               <label for="issuePriority">Urgency Priority</label>
               <select id="issuePriority">
@@ -607,7 +823,7 @@ tbody tr:hover { background: rgba(74,222,128,.05); }
               </div>
               <div class="field">
                 <label for="amount">Quantity</label>
-                <input id="amount" type="number" min="0.01" max="10000000" step="any" placeholder="e.g. 45" required>
+                <input id="amount" type="number" min="0" max="10000000" step="any" placeholder="e.g. 45" required>
               </div>
               <div class="field">
                 <label for="unit">Unit</label>
@@ -616,6 +832,14 @@ tbody tr:hover { background: rgba(74,222,128,.05); }
               <div class="field">
                 <label for="area">Campus Area / Room</label>
                 <input id="area" maxlength="70" placeholder="e.g. Computer Lab 2" required>
+              </div>
+              <div class="field">
+                <label for="building">Building</label>
+                <input id="building" maxlength="100" placeholder="Defaults to campus area if omitted">
+              </div>
+              <div class="field">
+                <label for="department">Department</label>
+                <input id="department" maxlength="100" placeholder="e.g. Computer Science">
               </div>
               <div class="field">
                 <label for="date">Date of Reading</label>
@@ -696,6 +920,31 @@ tbody tr:hover { background: rgba(74,222,128,.05); }
         <div class="challenges" id="challenges"></div>
       </div>
     </section>
+
+    <section class="page" id="page-users">
+      <div class="card">
+        <div class="card-header-flex">
+          <div><h3>Users &amp; Role Assignments</h3><p class="card-desc">New registrations start as users. Assign department managers here; roles are verified by the server.</p></div>
+          <span class="badge badge-Resolved" id="userCount">0 accounts</span>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Department</th><th>Account</th><th>Save</th></tr></thead>
+          <tbody id="usersBody"></tbody>
+        </table></div>
+        <p class="monitor-note">The bootstrap administrator is configured through server environment variables. Passwords are never shown here.</p>
+      </div>
+    </section>
+
+    <section class="page" id="page-audit">
+      <div class="card">
+        <h3>Administrative Audit Log</h3>
+        <p class="card-desc">Recent administrator account, incident, and limit changes. Passwords and authentication tokens are never recorded.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Time</th><th>Administrator</th><th>Action</th><th>Target</th><th>Details</th></tr></thead>
+          <tbody id="auditBody"></tbody>
+        </table></div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -722,28 +971,60 @@ let completed = [];
 let issues = [];
 let leaderboard = [];
 let insights = [];
+let monitoring = null;
+let currentUser = null;
+let csrfToken = '';
+let managedUsers = [];
+let auditLogs = [];
 
 const $ = id => document.getElementById(id);
 
 // ── API Helpers ───────────────────────────────────────────────────────
+function showAuthentication(message = '') {
+  currentUser = null;
+  $('appShell').style.display = 'none';
+  $('authGate').style.display = 'grid';
+  $('authNotice').textContent = message;
+}
+
 async function apiGet(path) {
   const res = await fetch(API + path);
+  if (res.status === 401) showAuthentication('Your session has expired. Please sign in again.');
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
 async function apiPost(path, body) {
   const res = await fetch(API + path, {
-    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+    method: 'POST',
+    headers: {'Content-Type':'application/json','X-CSRF-Token':csrfToken},
+    body: JSON.stringify(body)
   });
+  if (res.status === 401 && !path.startsWith('/api/auth/')) {
+    showAuthentication('Your session has expired. Please sign in again.');
+  }
   if (!res.ok) {
     const err = await res.json().catch(() => ({error:'Request failed'}));
     throw new Error(err.error || 'Request failed');
   }
   return res.json();
 }
+async function apiPatch(path, body) {
+  const res = await fetch(API + path, {
+    method:'PATCH',
+    headers:{'Content-Type':'application/json','X-CSRF-Token':csrfToken},
+    body:JSON.stringify(body)
+  });
+  const result = await res.json().catch(() => ({error:'Request failed'}));
+  if (!res.ok) throw new Error(result.error || 'Request failed');
+  return result;
+}
 async function apiDelete(path) {
-  const res = await fetch(API + path, {method:'DELETE'});
-  if (!res.ok) throw new Error('Delete failed');
+  const res = await fetch(API + path, {method:'DELETE',headers:{'X-CSRF-Token':csrfToken}});
+  if (res.status === 401) showAuthentication('Your session has expired. Please sign in again.');
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({error:'Delete failed'}));
+    throw new Error(err.error || 'Delete failed');
+  }
   return res.json();
 }
 
@@ -757,18 +1038,34 @@ function toast(msg) {
 // ── Load All Data ─────────────────────────────────────────────────────
 async function loadAll() {
   try {
-    const [ent, act, iss, lb, ins] = await Promise.all([
+    const monitoringRequest = apiGet(`/api/monitoring?period=${encodeURIComponent($('monitorPeriod').value)}&resource=${encodeURIComponent($('monitorResource').value)}`)
+      .catch(err => {
+        console.error('Monitoring data load error:', err);
+        return {error:err.message};
+      });
+    const [ent, act, iss, lb, ins, mon] = await Promise.all([
       apiGet('/api/entries'),
       apiGet('/api/actions'),
       apiGet('/api/issues'),
       apiGet('/api/leaderboard'),
-      apiGet('/api/insights')
+      apiGet('/api/insights'),
+      monitoringRequest
     ]);
     entries = ent;
     completed = act;
     issues = iss;
     leaderboard = lb;
     insights = ins;
+    monitoring = mon;
+    if (currentUser.role === 'admin') {
+      [managedUsers, auditLogs] = await Promise.all([
+        apiGet('/api/admin/users'),
+        apiGet('/api/admin/audit-logs')
+      ]);
+    } else {
+      managedUsers = [];
+      auditLogs = [];
+    }
     renderAll();
   } catch (err) {
     console.error('Data load error:', err);
@@ -779,11 +1076,160 @@ async function loadAll() {
 // ── Render Everything ─────────────────────────────────────────────────
 function renderAll() {
   renderOverview();
+  renderMonitoring();
   renderLeaderboard();
   renderIssues();
   renderInsights();
   renderRecords();
   renderActions();
+  renderAdminUsers();
+  renderAuditLogs();
+}
+
+function statusClass(status) {
+  return ({
+    'Over Consumption':'status-over-consumption',
+    'Within Limit':'status-within-limit',
+    'Under Usage':'status-under-usage',
+    'Missing Data':'status-missing-data'
+  })[status] || 'status-missing-data';
+}
+
+function formatConsumption(value, unit) {
+  if (value === null || value === undefined) return 'N/A';
+  return `${Number(value).toLocaleString(undefined,{maximumFractionDigits:2})} ${esc(unit || '')}`.trim();
+}
+
+function statusBadge(status) {
+  return `<span class="monitor-status ${statusClass(status)}">${esc(status || 'Missing Data')}</span>`;
+}
+
+function renderMiniTrend(points, unit) {
+  const values = (points || []).map(point => point.value).filter(value => value !== null);
+  const max = Math.max(1, ...values);
+  return `<div class="monitor-sparkline">${(points || []).map(point => `
+    <span title="${esc(point.period)}: ${point.value === null ? 'No reading' : formatConsumption(point.value,unit)}"
+      style="height:${point.value === null ? 2 : Math.max(3,Number(point.value)/max*26)}px;${point.value === null ? 'background:var(--line)' : ''}"></span>
+  `).join('')}</div>`;
+}
+
+function renderMonitoring() {
+  if (!monitoring) return;
+  if (monitoring.error) {
+    $('monitorStatus').className = 'monitor-status status-missing-data';
+    $('monitorStatus').textContent = 'Unavailable';
+    $('monitorAsOf').textContent = 'Monitoring data could not be loaded.';
+    $('monitorQuality').textContent = monitoring.error;
+    $('monitorTotal').textContent = '—';
+    $('monitorAverage').textContent = '—';
+    $('monitorDailyAverage').textContent = '';
+    $('monitorLimit').textContent = '—';
+    $('monitorPerBuilding').textContent = '—';
+    $('monitorTrend').innerHTML = '';
+    $('resourceComparison').innerHTML = '';
+    $('buildingMonitoring').innerHTML = '';
+    $('departmentMonitoring').innerHTML = '';
+    $('monitorAlerts').innerHTML = '';
+    return;
+  }
+  const summary = monitoring.university;
+  const chosenResource = monitoring.resource !== 'all';
+  $('limitAmountLabel').textContent = chosenResource
+    ? `Maximum consumption for selected period (${units[monitoring.resource] || ''})`
+    : 'Maximum consumption for selected period (select one resource)';
+  const unit = summary?.unit || '';
+  const format = value => formatConsumption(value, unit);
+  const statusEl = $('monitorStatus');
+  statusEl.className = `monitor-status ${statusClass(chosenResource ? summary?.status : 'Missing Data')}`;
+  statusEl.textContent = chosenResource ? (summary?.status || 'Missing Data') : 'Select a resource';
+  $('monitorAsOf').textContent = summary?.period_key
+    ? `Latest available ${monitoring.period} period: ${summary.period_key}${monitoring.as_of_date ? ` · latest reading ${monitoring.as_of_date}` : ''}`
+    : 'No valid resource readings are available for this selection.';
+  $('monitorTotal').textContent = chosenResource ? format(summary?.actual) : '—';
+  $('monitorAverage').textContent = chosenResource ? format(summary?.average) : '—';
+  $('monitorDailyAverage').textContent = chosenResource
+    ? `Observed-date daily average: ${format(summary?.average_daily_consumption)}`
+    : '';
+  $('monitorLimit').textContent = chosenResource
+    ? `${format(summary?.limit)}${summary?.percent_limit === null || summary?.percent_limit === undefined ? '' : ` · ${summary.percent_limit}%`}`
+    : '—';
+  $('monitorPerBuilding').textContent = chosenResource
+    ? format(summary?.average_per_building)
+    : '—';
+  $('monitorQuality').textContent = chosenResource
+    ? `${summary?.data_quality || 'Missing data'} · University limit source: ${esc(summary?.limit_source || 'No limit')} · Default maximum: ${monitoring.limit_multiplier}× historical average · Under-usage threshold: ${monitoring.default_under_usage_ratio * 100}% · Absolute consumption; no area, occupancy, or operating-hours data is available for normalization${summary?.highest_consuming_building ? ` · Highest: ${esc(summary.highest_consuming_building)}` : ''}${summary?.lowest_consuming_building ? ` · Lowest: ${esc(summary.lowest_consuming_building)}` : ''}${summary ? ` · Buildings: ${summary.buildings_over_limit} over, ${summary.buildings_within_limit} within, ${summary.buildings_under_usage} under usage` : ''}${monitoring.invalid_date_entries ? ` · ${monitoring.invalid_date_entries} invalid-date record(s) excluded` : ''}${monitoring.invalid_unit_entries ? ` · ${monitoring.invalid_unit_entries} unsupported-unit record(s) excluded` : ''}`
+    : 'Resource comparison shows each unit separately; unlike units are not added together.';
+
+  $('resourceComparison').innerHTML = (monitoring.resource_summaries || []).map(item => `
+    <tr>
+      <td>${esc(labels[item.resource] || item.resource)}</td>
+      <td>${formatConsumption(item.actual,item.unit)}</td>
+      <td>${formatConsumption(item.average,item.unit)}</td>
+      <td>${formatConsumption(item.limit,item.unit)}</td>
+      <td>${statusBadge(item.status)}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="5">No resource readings or baselines are configured.</td></tr>';
+
+  const trend = summary?.trend || [];
+  const values = trend.map(point => point.value).filter(value => value !== null);
+  const maxTrend = Math.max(1, ...values);
+  $('monitorTrend').innerHTML = trend.length ? trend.map(point => `
+    <div class="chart-col">
+      <div class="chart-bar" style="height:${point.value === null ? 4 : Math.max(5, Number(point.value)/maxTrend*140)}px;${point.value === null ? 'background:var(--line)' : ''}">
+        <div class="tooltip">${point.value === null ? 'No reading' : `${format(point.value)} · ${esc(point.period)}`}</div>
+      </div>
+      <div class="chart-label">${esc(monitoring.period === 'weekly' ? point.period.slice(-3) : point.period.slice(5))}</div>
+    </div>
+  `).join('') : '<div class="monitor-note">No historical periods to chart.</div>';
+
+  const buildingRows = monitoring.buildings || [];
+  $('buildingMonitoring').innerHTML = buildingRows.length ? buildingRows.map(item => `
+    <tr>
+      <td><b>${esc(item.name)}</b></td>
+      <td>${esc(item.department || 'Unassigned')}</td>
+      <td>${format(item.actual)}</td>
+      <td>${format(item.average)}</td>
+      <td>${format(item.limit)}<div class="monitor-note">${esc(item.limit_source)}</div></td>
+      <td>${item.percent_limit === null ? '—' : `${item.percent_limit}%`}<div class="monitor-bar"><span style="width:${Math.min(100,item.percent_limit || 0)}%;background:${item.status === 'Over Consumption' ? 'var(--danger)' : item.status === 'Under Usage' ? 'var(--info)' : 'var(--pri)'}"></span></div></td>
+      <td>${item.difference === null ? '—' : `${item.difference > 0 ? '+' : ''}${format(item.difference)}`}</td>
+      <td>${renderMiniTrend(item.trend,item.unit)}</td>
+      <td>${statusBadge(item.status)}</td>
+      <td>${esc(item.data_quality)}${item.sample_data ? ' · sample' : ''}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="10">No building readings yet. New records can include a building and department.</td></tr>';
+
+  const departmentRows = monitoring.departments || [];
+  $('departmentMonitoring').innerHTML = departmentRows.length ? departmentRows.map(item => `
+    <tr>
+      <td><b>${esc(item.name)}</b></td>
+      <td>${format(item.actual)}</td>
+      <td>${format(item.average)}</td>
+      <td>${format(item.limit)}<div class="monitor-note">${esc(item.limit_source)}</div></td>
+      <td>${item.percent_limit === null ? '—' : `${item.percent_limit}%`}<div class="monitor-bar"><span style="width:${Math.min(100,item.percent_limit || 0)}%;background:${item.status === 'Over Consumption' ? 'var(--danger)' : item.status === 'Under Usage' ? 'var(--info)' : 'var(--pri)'}"></span></div></td>
+      <td>${renderMiniTrend(item.trend,item.unit)}</td>
+      <td>${statusBadge(item.status)}</td>
+      <td>${esc(item.data_quality)}${item.sample_data ? ' · sample' : ''}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="8">No department readings are available.</td></tr>';
+
+  const alerts = monitoring.alerts || [];
+  $('monitorAlerts').innerHTML = alerts.length
+    ? `<h3 style="font-size:14px; margin-bottom:8px">Consumption alerts & recommendations</h3>${alerts.map(alert => `
+      <div class="monitor-alert ${alert.status === 'Under Usage' ? 'under' : ''}">
+        ${statusBadge(alert.status)}
+        <b>${esc(alert.name)} · ${esc(labels[alert.resource] || alert.resource)}</b>
+        <span> ${formatConsumption(alert.actual,alert.unit)} of ${formatConsumption(alert.limit,alert.unit)} (${alert.percent_limit ?? '—'}%)</span>
+        <div class="monitor-note">${esc(alert.recommendation)}</div>
+      </div>
+    `).join('')}`
+    : '<p class="monitor-note">No active over-limit or under-usage alerts for this selection. Missing or outdated readings are shown in the tables.</p>';
+
+  $('limitScopeName').disabled = $('limitScope').value === 'university';
+  document.querySelector('.monitor-editor').hidden = currentUser?.role !== 'admin';
+  if ($('limitScope').value === 'university') $('limitScopeName').value = 'University';
+  if (!$('underUsagePercent').dataset.userEdited && monitoring.default_under_usage_ratio !== undefined) {
+    $('underUsagePercent').value = String(monitoring.default_under_usage_ratio * 100);
+  }
 }
 
 function renderOverview() {
@@ -868,11 +1314,41 @@ function renderIssues() {
       <div class="issue-meta">📍 ${esc(iss.area)} · Priority: <b>${iss.priority}</b> · By: ${esc(iss.reporter)}</div>
       <div class="issue-desc">${esc(iss.description || 'No additional note.')}</div>
       <div class="issue-actions">
-        ${iss.status !== 'Resolved' ? `<button class="btn btn-soft" data-iss-status="${iss.id}" data-new-status="Resolved">✓ Mark Resolved</button>` : ''}
-        ${iss.status === 'Reported' ? `<button class="btn btn-ghost" data-iss-status="${iss.id}" data-new-status="In Progress">⚡ Take Up (In Progress)</button>` : ''}
-        <button class="btn btn-danger" data-iss-del="${iss.id}">✕ Delete</button>
+        ${currentUser?.role !== 'user' && iss.status !== 'Resolved' ? `<button class="btn btn-soft" data-iss-status="${iss.id}" data-new-status="Resolved">✓ Mark Resolved</button>` : ''}
+        ${currentUser?.role !== 'user' && iss.status === 'Reported' ? `<button class="btn btn-ghost" data-iss-status="${iss.id}" data-new-status="In Progress">⚡ Take Up (In Progress)</button>` : ''}
+        ${currentUser?.role === 'admin' ? `<button class="btn btn-danger" data-iss-del="${iss.id}">✕ Delete</button>` : ''}
       </div>
     </div>
+  `).join('');
+}
+
+function renderAdminUsers() {
+  if (!$('usersBody')) return;
+  $('userCount').textContent = `${managedUsers.length} accounts`;
+  $('usersBody').innerHTML = managedUsers.map(user => `
+    <tr>
+      <td>${esc(user.display_name)}</td><td>${esc(user.username)}</td>
+      <td><select class="filter-input" data-user-role="${user.id}">
+        ${['user','manager','admin'].map(role => `<option value="${role}" ${user.role === role ? 'selected' : ''}>${role}</option>`).join('')}
+      </select></td>
+      <td><input class="filter-input" data-user-department="${user.id}" value="${esc(user.department || '')}" placeholder="Department"></td>
+      <td><select class="filter-input" data-user-active="${user.id}">
+        <option value="true" ${user.is_active ? 'selected' : ''}>Active</option>
+        <option value="false" ${!user.is_active ? 'selected' : ''}>Disabled</option>
+      </select></td>
+      <td><button class="btn btn-soft" data-user-save="${user.id}">Save</button></td>
+    </tr>
+  `).join('');
+}
+
+function renderAuditLogs() {
+  if (!$('auditBody')) return;
+  $('auditBody').innerHTML = auditLogs.map(log => `
+    <tr>
+      <td>${esc(log.created_at)}</td><td>${esc(log.actor_username || 'Removed account')}</td>
+      <td>${esc(log.action)}</td><td>${esc(log.target_type)} · ${esc(log.target_id)}</td>
+      <td>${esc(log.details)}</td>
+    </tr>
   `).join('');
 }
 
@@ -983,19 +1459,39 @@ function renderActions() {
 function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 // ── Navigation ────────────────────────────────────────────────────────
-function go(page) {
+const pagePaths = {
+  dashboard:'dashboard', leaderboard:'leaderboard', issues:'incidents', insights:'eco-advisor',
+  log:'resources', records:'activities', actions:'green-actions', users:'users', audit:'audit-logs'
+};
+
+function routePage() {
+  const pathname = window.location.pathname.replace(/\/+$/, '');
+  const name = pathname.split('/').pop();
+  const page = {
+    dashboard:'dashboard', leaderboard:'leaderboard', incidents:'issues',
+    'eco-advisor':'insights', resources:'log', activities:'records',
+    'green-actions':'actions', users:'users', 'audit-logs':'audit', limits:'dashboard', consumption:'dashboard'
+  }[name];
+  return page || 'dashboard';
+}
+
+function go(page, updateUrl = true) {
+  const pageElement = $('page-' + page);
+  if (!pageElement || (!currentUser || (['users','audit'].includes(page) && currentUser.role !== 'admin'))) return;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  $('page-' + page).classList.add('active');
+  pageElement.classList.add('active');
   document.querySelectorAll('[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === page));
 
   const titles = {
-    dashboard: ['CAMPUS IMPACT CENTER', 'Good morning, changemaker.', 'Live campus sustainability metrics & audits.'],
+    dashboard: [currentUser.role === 'admin' ? 'ADMINISTRATOR PANEL' : 'CAMPUS IMPACT CENTER', currentUser.role === 'admin' ? 'University sustainability overview.' : 'Good morning, changemaker.', 'Live campus sustainability metrics & audits.'],
     leaderboard: ['INTER-FACULTY COMPETITION', 'Sustainability Leaderboard', 'Real-time standings across departments & residences.'],
     issues: ['CAMPUS HAZARD DESK', 'Incident & Leak Management', 'Report water leaks, idle electronics, and track ticket status.'],
     insights: ['DATA-DRIVEN RECOMMENDATIONS', 'AI Eco-Advisor & Anomaly Alerts', 'Algorithmic resource optimization opportunities.'],
     log: ['DATA INGESTION', 'Log Resource Measurements', 'Submit manual sub-meter values or send IoT sensor streams.'],
     records: ['HISTORICAL AUDIT', 'Campus Activity Records', 'Search, filter, and inspect verified consumption entries.'],
-    actions: ['BEHAVIORAL HABITS', 'Green Action Checklist', 'Check off daily habits to reduce campus footprint.']
+    actions: ['BEHAVIORAL HABITS', 'Green Action Checklist', 'Check off daily habits to reduce campus footprint.'],
+    users: ['ACCESS MANAGEMENT', 'Users & Role Assignments', 'Manage trusted accounts and assigned department access.'],
+    audit: ['ACCOUNTABILITY', 'Administrative Audit Log', 'Review recent privileged changes across the platform.']
   };
 
   if (titles[page]) {
@@ -1003,13 +1499,117 @@ function go(page) {
     $('title').textContent = titles[page][1];
     $('subtitle').textContent = titles[page][2];
   }
-  $('sidebar').classList.remove('open');
+  if (updateUrl) {
+    const prefix = currentUser.role === 'admin' ? '/admin/' : '/user/';
+    const route = prefix + (pagePaths[page] || 'dashboard');
+    if (window.location.pathname !== route) history.pushState({page}, '', route);
+  }
+  setMobileMenu(false);
+}
+
+function enterApplication(user, token, updateUrl = true) {
+  const openAdminLimits = user.role === 'admin' &&
+    ['/limits','/consumption'].some(suffix => window.location.pathname.endsWith(suffix));
+  currentUser = user;
+  csrfToken = token;
+  $('authGate').style.display = 'none';
+  $('appShell').style.display = '';
+  $('profileName').textContent = user.display_name;
+  $('profileRole').textContent = user.role === 'manager' ? `Manager · ${user.department}` : user.role;
+  $('panelName').textContent = user.role === 'admin' ? 'ADMIN CONTROL PANEL' : 'USER SUSTAINABILITY PANEL';
+  $('userNav').hidden = user.role === 'admin';
+  $('adminNav').hidden = user.role !== 'admin';
+  document.querySelectorAll('[data-role="admin"]').forEach(element => {
+    element.hidden = user.role !== 'admin';
+  });
+  $('limitScope').disabled = user.role !== 'admin';
+  $('issueDepartmentField').hidden = user.role !== 'admin';
+  $('simulateIot').hidden = user.role !== 'admin';
+  $('btnTestIot').hidden = user.role !== 'admin';
+  $('export').hidden = user.role !== 'admin';
+  $('printReport').hidden = user.role !== 'admin';
+  go(routePage(), updateUrl);
+  if (openAdminLimits) {
+    document.querySelector('.monitor-editor').open = true;
+    document.querySelector('.monitor-editor').scrollIntoView({block:'start'});
+  }
+}
+
+function setAuthMode(registering) {
+  $('loginForm').hidden = registering;
+  $('registerForm').hidden = !registering;
+  $('authTitle').textContent = registering ? 'Create your EcoCampus account' : 'Welcome to EcoCampus';
+  $('authDescription').textContent = registering
+    ? 'Register a standard user account. Administrator and manager roles are assigned by the university.'
+    : 'Sign in to access your sustainability dashboard.';
+  $('authModeToggle').textContent = registering ? 'Already registered? Sign in' : 'Create a user account';
+  $('authNotice').textContent = '';
 }
 
 // ── Event Listeners ───────────────────────────────────────────────────
 document.querySelectorAll('[data-page]').forEach(b => b.addEventListener('click', () => go(b.dataset.page)));
 document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => go(b.dataset.goto)));
-$('menuToggle').addEventListener('click', () => $('sidebar').classList.toggle('open'));
+document.querySelector('[data-admin-monitor]').addEventListener('click', () => {
+  go('dashboard');
+  document.querySelector('.monitor-editor').open = true;
+  document.querySelector('.monitor-editor').scrollIntoView({block:'start'});
+});
+function setMobileMenu(open) {
+  $('sidebar').classList.toggle('open', open);
+  $('menuBackdrop').classList.toggle('show', open);
+  $('menuToggle').setAttribute('aria-expanded', String(open));
+  $('menuToggle').setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+}
+document.getElementById('authModeToggle').addEventListener('click', () => {
+  setAuthMode($('loginForm').hidden);
+});
+document.getElementById('loginForm').addEventListener('submit', async event => {
+  event.preventDefault();
+  $('authNotice').textContent = '';
+  try {
+    const result = await apiPost('/api/auth/login', {
+      username:$('loginUsername').value.trim(),
+      password:$('loginPassword').value
+    });
+    enterApplication(result.user, result.csrf_token);
+    await loadAll();
+  } catch (error) {
+    $('authNotice').textContent = error.message;
+  }
+});
+document.getElementById('registerForm').addEventListener('submit', async event => {
+  event.preventDefault();
+  $('authNotice').textContent = '';
+  try {
+    const result = await apiPost('/api/auth/register', {
+      username:$('registerUsername').value.trim(),
+      display_name:$('registerName').value.trim(),
+      password:$('registerPassword').value
+    });
+    enterApplication(result.user, result.csrf_token);
+    await loadAll();
+  } catch (error) {
+    $('authNotice').textContent = error.message;
+  }
+});
+$('logoutButton').addEventListener('click', async () => {
+  try {
+    await apiPost('/api/auth/logout', {});
+    window.history.replaceState({}, '', '/login');
+    showAuthentication('You have signed out.');
+    csrfToken = '';
+  } catch (error) {
+    toast('⚠ ' + error.message);
+  }
+});
+window.addEventListener('popstate', () => {
+  if (currentUser) go(routePage(), false);
+});
+$('menuToggle').addEventListener('click', () => setMobileMenu(!$('sidebar').classList.contains('open')));
+$('menuBackdrop').addEventListener('click', () => setMobileMenu(false));
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') setMobileMenu(false);
+});
 
 // Theme toggle & persistence
 $('themeToggle').addEventListener('click', () => {
@@ -1026,6 +1626,61 @@ $('themeToggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 // Unit sync & local date initialization
 $('date').value = getLocalDate();
 $('resource').addEventListener('change', () => { $('unit').value = units[$('resource').value] || 'kg'; });
+$('monitorPeriod').addEventListener('change', loadMonitoring);
+$('monitorResource').addEventListener('change', loadMonitoring);
+$('limitScope').addEventListener('change', () => {
+  $('limitScopeName').disabled = $('limitScope').value === 'university';
+  $('limitScopeName').value = $('limitScope').value === 'university' ? 'University' : '';
+});
+$('underUsagePercent').addEventListener('input', () => {
+  $('underUsagePercent').dataset.userEdited = 'true';
+});
+
+async function loadMonitoring() {
+  try {
+    monitoring = await apiGet(`/api/monitoring?period=${encodeURIComponent($('monitorPeriod').value)}&resource=${encodeURIComponent($('monitorResource').value)}`);
+    renderMonitoring();
+  } catch (err) {
+    console.error('Monitoring data load error:', err);
+    monitoring = {error:err.message};
+    renderMonitoring();
+    toast('⚠ Resource monitoring unavailable: ' + err.message);
+  }
+}
+
+// Limit updates are authorized from the signed-in server-side administrator role.
+$('limitForm').addEventListener('submit', async event => {
+  event.preventDefault();
+  const resource = $('monitorResource').value;
+  if (resource === 'all') {
+    toast('Select one resource before configuring its limit.');
+    return;
+  }
+  const scopeType = $('limitScope').value;
+  const scopeName = scopeType === 'university' ? 'University' : $('limitScopeName').value.trim();
+  const maxConsumption = Number($('limitAmount').value);
+  const underUsageRatio = Number($('underUsagePercent').value) / 100;
+  if ((scopeType !== 'university' && !scopeName) || !(maxConsumption > 0) ||
+      !Number.isFinite(maxConsumption) || underUsageRatio < 0 || underUsageRatio > 1) {
+    toast('Enter a valid scope, positive limit, and under-usage threshold from 0 to 100%.');
+    return;
+  }
+  try {
+    await apiPost('/api/monitoring/limits', {
+      scope_type:scopeType, scope_name:scopeName, resource,
+      period:$('monitorPeriod').value, max_consumption:maxConsumption,
+      under_usage_ratio:underUsageRatio
+    });
+    $('limitForm').reset();
+    delete $('underUsagePercent').dataset.userEdited;
+    $('underUsagePercent').value = String((monitoring?.default_under_usage_ratio ?? 0.5) * 100);
+    $('limitScopeName').disabled = false;
+    await loadMonitoring();
+    toast('✅ Consumption limit saved.');
+  } catch (err) {
+    toast('⚠ ' + err.message);
+  }
+});
 
 // Form: Resource entry
 $('resourceForm').addEventListener('submit', async e => {
@@ -1033,10 +1688,11 @@ $('resourceForm').addEventListener('submit', async e => {
   const resource = $('resource').value;
   const amount = Number($('amount').value);
   const area = $('area').value.trim();
-  if (!(amount > 0) || !area) { toast('Enter quantity > 0 and campus area.'); return; }
+  if (!(amount >= 0) || !area) { toast('Enter a non-negative quantity and campus area.'); return; }
   try {
     await apiPost('/api/entries', {
       resource, amount, unit:$('unit').value, area,
+      building:$('building').value.trim(), department:$('department').value.trim(),
       date:$('date').value, reporter:$('reporter').value.trim(), note:$('note').value.trim()
     });
     await loadAll();
@@ -1073,6 +1729,21 @@ $('issueForm').addEventListener('submit', async e => {
 
 // Delegated click handling using .closest() for reliability across nested nodes
 document.addEventListener('click', async e => {
+  const userSaveBtn = e.target.closest('[data-user-save]');
+  if (userSaveBtn) {
+    const userId = userSaveBtn.dataset.userSave;
+    try {
+      await apiPatch(`/api/admin/users/${userId}`, {
+        role:$(`[data-user-role="${userId}"]`).value,
+        department:$(`[data-user-department="${userId}"]`).value.trim(),
+        is_active:$(`[data-user-active="${userId}"]`).value === 'true'
+      });
+      await loadAll();
+      toast('Account permissions updated.');
+    } catch (err) { toast('⚠ ' + err.message); }
+    return;
+  }
+
   const statusBtn = e.target.closest('[data-iss-status]');
   if (statusBtn) {
     const id = statusBtn.dataset.issStatus;
@@ -1159,8 +1830,29 @@ $('btnTestIot').addEventListener('click', triggerIotPing);
 // CSV Export
 $('export').addEventListener('click', () => { window.location.href = API + '/api/export'; });
 
-// ── Startup ───────────────────────────────────────────────────────────
-loadAll();
+async function initializeApplication() {
+  try {
+    const response = await fetch('/api/auth/me');
+    if (!response.ok) throw new Error('Could not load account status.');
+    const auth = await response.json();
+    csrfToken = auth.csrf_token;
+    if (auth.user) {
+      enterApplication(auth.user);
+      await loadAll();
+      return;
+    }
+    showAuthentication();
+    if (window.location.pathname === '/register') setAuthMode(true);
+    if (!auth.admin_configured) {
+      $('authNotice').textContent = 'User registration is available. Configure BOOTSTRAP_ADMIN_USERNAME and BOOTSTRAP_ADMIN_PASSWORD on the server to enable the first administrator account.';
+    }
+  } catch (error) {
+    showAuthentication('Could not connect to the EcoCampus server. Refresh after the server is available.');
+    console.error('Authentication initialization failed:', error);
+  }
+}
+
+initializeApplication();
 </script>
 </body>
 </html>
