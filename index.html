@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoCampus | Next-Gen Sustainability Hub</title>
+<meta name="description" content="Intelligent campus sustainability dashboard: resource metering, incident reporting, departmental leaderboards, and AI eco-advisor.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ── Design Tokens ─────────────────────────────────────────────── */
+:root {
+  --pri: #16a34a; --pri-dark: #15803d; --pri-light: #dcfce7;
+  --accent: #059669; --accent2: #0d9488; --warn: #b45309; --danger: #dc2626; --info: #2563eb;
+  --bg: #f3f9f4; --bg2: #ffffff; --surface: #ffffff;
+  --text: #052e16; --text2: #166534; --muted: #64748b;
+  --line: #e2ece3; --shadow: 0 4px 20px rgba(5,46,22,.06);
+  --shadow-lg: 0 14px 40px rgba(5,46,22,.12);
+  --radius: 16px; --radius-sm: 10px;
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  --transition: .25s cubic-bezier(.4,0,.2,1);
+  --sidebar-w: 260px;
+}
+[data-theme="dark"] {
+  --bg: #09150e; --bg2: #0f2217; --surface: #132a1d;
+  --text: #e8f5e9; --text2: #a5d6a7; --muted: #86a290;
+  --warn: #fbbf24; --danger: #f87171; --info: #60a5fa;
+  --line: #1c3b29; --shadow: 0 4px 24px rgba(0,0,0,.35);
+  --shadow-lg: 0 14px 40px rgba(0,0,0,.5);
+  --pri-light: #163e26;
+}
+
+/* ── Reset & Base ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font); background: var(--bg); color: var(--text);
+  min-height: 100vh; overflow-x: hidden;
+  transition: background var(--transition), color var(--transition);
+}
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; border: 0; }
+
+/* ── App Shell ─────────────────────────────────────────────────── */
+.app { display: grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: 100vh; }
+
+/* ── Sidebar ───────────────────────────────────────────────────── */
+.side {
+  background: linear-gradient(180deg, #052e16 0%, #14532d 45%, #166534 100%);
+  color: #fff; padding: 26px 18px; display: flex; flex-direction: column;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  transition: transform var(--transition); z-index: 100;
+}
+[data-theme="dark"] .side { background: linear-gradient(180deg, #030c07 0%, #081d11 45%, #0e2b1b 100%); }
+
+.brand { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+.brand-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: linear-gradient(135deg, #4ade80, #16a34a);
+  display: grid; place-items: center; font-size: 22px;
+  box-shadow: 0 4px 16px rgba(74,222,128,.35);
+}
+.brand-text h1 { font-size: 20px; font-weight: 800; letter-spacing: -.5px; }
+.brand-text small { font-size: 10px; letter-spacing: 2px; color: #86efac; display: block; }
+
+.nav { display: flex; flex-direction: column; gap: 4px; }
+.nav-btn {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: var(--radius-sm);
+  background: transparent; color: rgba(255,255,255,.7);
+  font-size: 13.5px; font-weight: 500; text-align: left;
+  transition: all var(--transition);
+}
+.nav-btn:hover { background: rgba(255,255,255,.09); color: #fff; transform: translateX(3px); }
+.nav-btn.active { background: rgba(74,222,128,.16); color: #fff; font-weight: 600; }
+.nav-icon { font-size: 17px; width: 22px; text-align: center; }
+
+.side-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.1); }
+.eco-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 20px;
+  background: rgba(74,222,128,.14); font-size: 11px; font-weight: 600; color: #86efac;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; animation: blink 1.8s infinite; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+
+/* ── Main Canvas ───────────────────────────────────────────────── */
+.main { padding: 30px 34px; max-width: 1440px; width: 100%; margin: 0 auto; }
+
+/* ── Top Bar ───────────────────────────────────────────────────── */
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 24px; gap: 14px; flex-wrap: wrap;
+}
+.topbar-left .eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+  color: var(--pri); text-transform: uppercase; margin-bottom: 3px;
+}
+.topbar-left h1 {
+  font-size: 26px; font-weight: 800; letter-spacing: -.5px;
+  background: linear-gradient(135deg, var(--text), var(--pri-dark));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.topbar-left .subtitle { font-size: 13.5px; color: var(--muted); margin-top: 2px; }
+.topbar-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* ── Buttons ───────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 16px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600; transition: all var(--transition);
+}
+.btn-primary { background: linear-gradient(135deg, var(--pri), var(--accent)); color: #fff; box-shadow: 0 4px 14px rgba(22,163,74,.25); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(22,163,74,.35); }
+.btn-soft { background: var(--pri-light); color: var(--pri-dark); }
+.btn-soft:hover { transform: translateY(-1px); filter: brightness(.95); }
+.btn-ghost { background: var(--surface); border: 1.5px solid var(--line); color: var(--text); }
+.btn-ghost:hover { border-color: var(--pri); color: var(--pri); }
+.hero .btn-ghost {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  backdrop-filter: blur(8px);
+}
+.hero .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+.btn-danger { background: #fee2e2; color: #dc2626; font-size: 12px; padding: 5px 9px; }
+.btn-danger:hover { background: #fecaca; }
+.btn-warn { background: #fef3c7; color: #b45309; }
+.btn-success { background: #dcfce7; color: #15803d; }
+
+.theme-toggle {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--surface); border: 1.5px solid var(--line);
+  display: grid; place-items: center; font-size: 17px; cursor: pointer;
+  transition: transform var(--transition);
+}
+.theme-toggle:hover { transform: scale(1.08); border-color: var(--pri); }
+
+/* ── Pages ─────────────────────────────────────────────────────── */
+.page { display: none; animation: fadeIn .3s ease-out; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Cards ─────────────────────────────────────────────────────── */
+.card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 22px;
+  box-shadow: var(--shadow); transition: all var(--transition);
+}
+.card:hover { box-shadow: var(--shadow-lg); }
+.card-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.card h3 { font-size: 16px; font-weight: 700; }
+.card-desc { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+/* ── Hero Banner ───────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, #052e16 0%, #166534 55%, #0d9488 100%);
+  border-radius: var(--radius); padding: 28px; color: #fff;
+  display: flex; justify-content: space-between; align-items: center; gap: 20px;
+  margin-bottom: 22px; position: relative; overflow: hidden;
+}
+.hero h2 { font-size: 23px; font-weight: 800; margin: 6px 0 8px; }
+.hero p { font-size: 13.5px; line-height: 1.6; color: #dcfce7; max-width: 580px; }
+.hero-cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+
+/* ── Stats Grid ────────────────────────────────────────────────── */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+.stat-card { position: relative; }
+.stat-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: grid; place-items: center; font-size: 19px; margin-bottom: 12px;
+}
+.stat-icon.elec { background: #fef3c7; }
+.stat-icon.water { background: #dbeafe; }
+.stat-icon.paper { background: #fce7f3; }
+.stat-icon.waste { background: #dcfce7; }
+.stat-label { font-size: 12px; color: var(--muted); font-weight: 500; }
+.stat-value { font-size: 28px; font-weight: 800; margin: 4px 0 2px; }
+.stat-value small { font-size: 13px; font-weight: 500; color: var(--muted); }
+
+/* ── Grid Layouts ──────────────────────────────────────────────── */
+.grid-2 { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; margin-bottom: 18px; }
+.grid-lower { display: grid; grid-template-columns: 1.25fr 1fr; gap: 18px; }
+
+/* ── Chart ─────────────────────────────────────────────────────── */
+.chart-area {
+  height: 170px; display: flex; align-items: flex-end; gap: 10px;
+  border-bottom: 2px solid var(--line); padding-top: 10px;
+}
+.chart-col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px; height: 100%; }
+.chart-bar {
+  width: 70%; max-width: 32px; border-radius: 6px 6px 2px 2px;
+  background: linear-gradient(180deg, var(--pri), var(--accent2));
+  min-height: 4px; position: relative; transition: all .3s;
+}
+.chart-bar:hover { filter: brightness(1.2); transform: scaleY(1.05); transform-origin: bottom; }
+.chart-bar .tooltip {
+  position: absolute; bottom: 105%; left: 50%; transform: translateX(-50%);
+  background: #0f172a; color: #fff; padding: 3px 8px; border-radius: 5px;
+  font-size: 10.5px; font-weight: 600; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.chart-bar:hover .tooltip { opacity: 1; }
+.chart-label { font-size: 11px; color: var(--muted); }
+
+/* ── Resource Breakdown ────────────────────────────────────────── */
+.resource-row { display: grid; grid-template-columns: 36px 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.resource-row:last-child { border-bottom: 0; }
+.progress-bar { height: 6px; background: var(--line); border-radius: 10px; margin-top: 6px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, var(--pri), var(--accent2)); transition: width 1s; }
+
+/* ── Leaderboard ───────────────────────────────────────────────── */
+.leaderboard-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+.leader-item {
+  display: flex; align-items: center; gap: 14px; padding: 14px 18px;
+  background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--radius-sm);
+  transition: all var(--transition);
+  box-shadow: 0 2px 8px rgba(5,46,22,.04);
+}
+.leader-item:hover { transform: translateX(4px); border-color: var(--pri); }
+[data-theme="dark"] .leader-item {
+  background: var(--bg);
+  border-color: var(--line);
+  box-shadow: none;
+}
+.leader-rank {
+  width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+  font-weight: 800; font-size: 14px; background: var(--surface); color: var(--text); border: 1.5px solid var(--line);
+}
+.leader-item:nth-child(1) .leader-rank { background: #fef08a; border-color: #eab308; color: #854d0e; }
+.leader-item:nth-child(2) .leader-rank { background: #e2e8f0; border-color: #94a3b8; color: #334155; }
+.leader-item:nth-child(3) .leader-rank { background: #ffedd5; border-color: #fb923c; color: #9a3412; }
+.leader-info { flex: 1; }
+.leader-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.leader-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.leader-points { text-align: right; }
+.leader-pts-val { font-size: 18px; font-weight: 800; color: var(--pri); }
+.leader-badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; background: var(--pri-light); color: var(--pri-dark); font-weight: 600; display: inline-block; margin-top: 3px; }
+
+/* ── Incident Reports ──────────────────────────────────────────── */
+.issues-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+.issue-card {
+  border: 1.5px solid var(--line); border-radius: var(--radius-sm); padding: 16px;
+  background: var(--surface); transition: all var(--transition);
+}
+.issue-card:hover { border-color: var(--pri); box-shadow: var(--shadow); }
+.issue-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 8px; }
+.issue-title { font-size: 14.5px; font-weight: 700; }
+.badge { font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; }
+.badge-Reported { background: #fee2e2; color: #dc2626; }
+.badge-In_Progress { background: #fef3c7; color: #b45309; }
+.badge-Resolved { background: #dcfce7; color: #15803d; }
+.issue-meta { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.issue-desc { font-size: 12.5px; line-height: 1.5; color: var(--text); margin-bottom: 12px; }
+.issue-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+/* ── AI Insights ───────────────────────────────────────────────── */
+.insights-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+.insight-card {
+  padding: 18px; border-radius: var(--radius-sm); border: 1.5px solid var(--line);
+  background: var(--surface); transition: all var(--transition);
+  box-shadow: 0 2px 8px rgba(5,46,22,.03);
+}
+.insight-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.insight-card.warning { border-left: 4px solid var(--warn); }
+.insight-card.success { border-left: 4px solid var(--pri); }
+.insight-card.info { border-left: 4px solid var(--info); }
+.insight-card.alert { border-left: 4px solid var(--danger); }
+.insight-tag {
+  display: inline-block; font-size: 10.5px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  padding: 3px 8px; border-radius: 6px; margin-bottom: 8px;
+}
+.insight-card.warning .insight-tag { background: #fef3c7; color: #b45309; }
+.insight-card.success .insight-tag { background: #dcfce7; color: #15803d; }
+.insight-card.info .insight-tag { background: #dbeafe; color: #1d4ed8; }
+.insight-card.alert .insight-tag { background: #fee2e2; color: #b91c1c; }
+.insight-card.tip .insight-tag { background: #e0e7ff; color: #4338ca; }
+
+[data-theme="dark"] .insight-card.warning .insight-tag { background: rgba(245, 158, 11, 0.22); color: #fbbf24; }
+[data-theme="dark"] .insight-card.success .insight-tag { background: rgba(22, 163, 74, 0.22); color: #4ade80; }
+[data-theme="dark"] .insight-card.info .insight-tag { background: rgba(59, 130, 246, 0.22); color: #60a5fa; }
+[data-theme="dark"] .insight-card.alert .insight-tag { background: rgba(239, 68, 68, 0.22); color: #f87171; }
+[data-theme="dark"] .insight-card.tip .insight-tag { background: rgba(99, 102, 241, 0.22); color: #a5b4fc; }
+
+.insight-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+.insight-card p { font-size: 12.5px; line-height: 1.6; color: var(--muted); margin-bottom: 14px; }
+.insight-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--line); }
+.insight-saving { font-size: 13px; font-weight: 800; color: var(--pri); }
+.insight-impact { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+
+/* ── Forms ─────────────────────────────────────────────────────── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label { font-size: 12px; font-weight: 600; }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 11px 13px; border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm); background: var(--surface); color: var(--text);
+  font-size: 13.5px; outline: none; transition: border-color var(--transition);
+}
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--pri); }
+.field.full { grid-column: 1 / -1; }
+
+/* ── Filter Bar ────────────────────────────────────────────────── */
+.filter-bar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.filter-input { padding: 8px 12px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); font-size: 13px; background: var(--surface); color: var(--text); }
+
+/* ── Table ─────────────────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+tbody tr:hover { background: rgba(74,222,128,.05); }
+
+/* ── Challenges ────────────────────────────────────────────────── */
+.challenges { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+.challenge-card { border: 1.5px solid var(--line); border-radius: var(--radius-sm); padding: 18px; text-align: center; }
+.challenge-card:hover { border-color: var(--pri); }
+
+/* ── Toast ─────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: #052e16; color: #fff; padding: 12px 20px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 500; z-index: 1000;
+  box-shadow: 0 8px 30px rgba(0,0,0,.3);
+  transform: translateY(80px); opacity: 0; transition: all .35s;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ── Mobile & Print ────────────────────────────────────────────── */
+.mobile-toggle { display: none; position: fixed; top: 14px; left: 14px; z-index: 110; width: 38px; height: 38px; border-radius: 8px; background: var(--surface); border: 1px solid var(--line); place-items: center; font-size: 18px; }
+@media (max-width: 960px) {
+  .app { grid-template-columns: 1fr; }
+  .mobile-toggle { display: grid; }
+  .side { position: fixed; transform: translateX(-100%); }
+  .side.open { transform: translateX(0); }
+  .main { padding: 56px 16px 24px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .grid-2, .grid-lower, .issues-grid, .insights-grid, .challenges { grid-template-columns: 1fr; }
+}
+
+@media print {
+  .side, .topbar-right, .hero-cta, button, .filter-bar, .notice, .mobile-toggle { display: none !important; }
+  .main { padding: 0 !important; max-width: 100% !important; }
+  .page { display: block !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+  .card { border: 1px solid #ccc !important; box-shadow: none !important; page-break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<button class="mobile-toggle" id="menuToggle">☰</button>
+
+<div class="app">
+  <!-- ── Sidebar ──────────────────────────────────────── -->
+  <aside class="side" id="sidebar">
+    <div class="brand">
+      <div class="brand-icon">🌿</div>
+      <div class="brand-text">
+        <h1>EcoCampus</h1>
+        <small>SUSTAINABILITY HUB</small>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" data-page="dashboard"><span class="nav-icon">📊</span> Overview</button>
+      <button class="nav-btn" data-page="leaderboard"><span class="nav-icon">🏆</span> Leaderboard</button>
+      <button class="nav-btn" data-page="issues"><span class="nav-icon">⚠️</span> Incident Reports</button>
+      <button class="nav-btn" data-page="insights"><span class="nav-icon">🤖</span> AI Eco-Advisor <span id="alertsBadge" style="display:none; margin-left:auto; background:#ef4444; color:#fff; font-size:10px; font-weight:700; padding:1px 6px; border-radius:10px;">0</span></button>
+      <button class="nav-btn" data-page="log"><span class="nav-icon">➕</span> Log Resources</button>
+      <button class="nav-btn" data-page="records"><span class="nav-icon">📋</span> Activity Records</button>
+      <button class="nav-btn" data-page="actions"><span class="nav-icon">🎯</span> Green Actions</button>
+    </nav>
+    <div class="side-footer">
+      <div class="eco-badge">
+        <span class="dot"></span>
+        <span id="entryCount">0 entries recorded</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ─────────────────────────────────────────── -->
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="eyebrow" id="eyebrow">CAMPUS IMPACT CENTER</div>
+        <h1 id="title">Good morning, changemaker.</h1>
+        <div class="subtitle" id="subtitle">Live campus sustainability metrics & audits.</div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-ghost" id="simulateIot" title="Simulate a real-time smart meter reading ping">📡 IoT Ping</button>
+        <button class="btn btn-ghost" id="printReport" title="Generate printable PDF report">📄 Print / PDF</button>
+        <button class="btn btn-ghost" id="export">↓ Export CSV</button>
+        <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
+      </div>
+    </header>
+
+    <!-- ── 1. Overview Page ────────────────────────────── -->
+    <section class="page active" id="page-dashboard">
+      <div class="hero">
+        <div>
+          <div class="eyebrow" style="color:#86efac">CAMPUS IMPACT CENTER</div>
+          <h2>Every resource saved is a step forward.</h2>
+          <p>Monitor electricity, water, paper, and waste in one centralized ecosystem. Detect anomalies, compete across faculties, and measure actual carbon footprint reduction.</p>
+          <div class="hero-cta">
+            <button class="btn btn-primary" data-goto="log">➕ Log Resource</button>
+            <button class="btn btn-soft" data-goto="issues">⚠️ Report a Leak / Waste</button>
+            <button class="btn btn-ghost" data-goto="leaderboard">🏆 Leaderboard</button>
+            <button class="btn btn-ghost" data-goto="insights">🤖 AI Advisor</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── AI Anomaly & Active Alerts Dashboard Widget ── -->
+      <div class="card" id="dashboardAlertsCard" style="margin-bottom: 20px; display: none; border-left: 4px solid var(--warn);">
+        <div class="card-header-flex" style="margin-bottom: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 19px;">⚠️</span>
+            <div>
+              <h3 style="font-size: 15px;">Active AI Anomaly Alerts & Resource Warnings</h3>
+              <p class="card-desc" style="font-size: 11.5px;">Algorithmic warnings detected from recent campus readings</p>
+            </div>
+          </div>
+          <button class="btn btn-soft" data-goto="insights" style="font-size: 11.5px; padding: 4px 10px;">View Full Advisor →</button>
+        </div>
+        <div id="dashboardAlertsList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+
+      <div class="stats">
+        <div class="card stat-card">
+          <div class="stat-icon elec">⚡</div>
+          <div class="stat-label">Electricity used</div>
+          <div class="stat-value" id="electric">0 <small>kWh</small></div>
+          <div class="card-desc">Active period readings</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-icon water">💧</div>
+          <div class="stat-label">Water consumed</div>
+          <div class="stat-value" id="water">0 <small>L</small></div>
+          <div class="card-desc">Active period readings</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-icon paper">📄</div>
+          <div class="stat-label">Paper consumed</div>
+          <div class="stat-value" id="paper">0 <small>sheets</small></div>
+          <div class="card-desc">Staff & printing records</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-icon waste">♻️</div>
+          <div class="stat-label">Waste segregated</div>
+          <div class="stat-value" id="waste">0 <small>kg</small></div>
+          <div class="card-desc">Recycled materials</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header-flex">
+            <div>
+              <h3>Recent Electricity Readings</h3>
+              <p class="card-desc">Latest consumption data by area</p>
+            </div>
+            <button class="btn btn-soft" data-goto="log" style="font-size:11px; padding:4px 8px">Add reading</button>
+          </div>
+          <div class="chart-area" id="chart"></div>
+        </div>
+
+        <div class="card">
+          <h3>Resource Breakdown vs Target</h3>
+          <p class="card-desc">Live consumption against benchmark targets</p>
+          <div id="breakdown"></div>
+        </div>
+      </div>
+
+      <div class="grid-lower">
+        <div class="card">
+          <div class="card-header-flex">
+            <div>
+              <h3>Green Actions In Progress</h3>
+              <p class="card-desc">Campus sustainability checklist</p>
+            </div>
+            <button class="btn btn-ghost" data-goto="actions" style="font-size:11px; padding:4px 8px">View all →</button>
+          </div>
+          <div id="actionPreview"></div>
+        </div>
+
+        <div class="card" style="text-align:center">
+          <div class="eyebrow" style="color:var(--pri)">ESTIMATED IMPACT</div>
+          <h3 style="margin-top:6px">Your Campus Sustainability Wins</h3>
+          <div style="font-size:40px; font-weight:900; color:var(--pri); margin:12px 0 6px" id="co2">0.0 kg CO₂</div>
+          <p class="card-desc">Avoided emissions model based on checked green actions.</p>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px">
+            <div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm)">
+              <b style="font-size:18px; color:var(--pri)" id="money">₹0</b>
+              <div class="card-desc">Estimated Savings</div>
+            </div>
+            <div style="background:var(--bg); padding:12px; border-radius:var(--radius-sm)">
+              <b style="font-size:18px" id="doneCount">0 / 5</b>
+              <div class="card-desc">Actions Completed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 2. Leaderboard Page ─────────────────────────── -->
+    <section class="page" id="page-leaderboard">
+      <div class="card">
+        <div class="card-header-flex">
+          <div>
+            <h3>🏆 Department & Hostel Sustainability Leaderboard</h3>
+            <p class="card-desc">Rankings based on utility conservation, verified recycling, and resolved hazard tickets.</p>
+          </div>
+          <span class="badge badge-Resolved">Live Semester Rankings</span>
+        </div>
+        <div class="leaderboard-list" id="leaderboardList"></div>
+      </div>
+    </section>
+
+    <!-- ── 3. Incident Reports Page ────────────────────── -->
+    <section class="page" id="page-issues">
+      <div class="card" style="margin-bottom:18px">
+        <h3>Report Environmental Incident / Waste Hazard</h3>
+        <p class="card-desc">Report running taps, ACs left on, leaking pipes, or overflowing bins to alert maintenance.</p>
+        <form id="issueForm" style="margin-top:14px">
+          <div class="form-grid">
+            <div class="field">
+              <label for="issueTitle">Incident Title</label>
+              <input id="issueTitle" placeholder="e.g. Dripping Tap in 3rd Floor Washroom" required>
+            </div>
+            <div class="field">
+              <label for="issueCategory">Category</label>
+              <select id="issueCategory">
+                <option value="water">💧 Water Leak / Running Tap</option>
+                <option value="electricity">⚡ Idle Equipment / Lights On</option>
+                <option value="waste">🗑️ Overflowing Bin / Unsorted Waste</option>
+                <option value="other">🌿 Other Hazard</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="issueArea">Campus Location</label>
+              <input id="issueArea" placeholder="e.g. Science Block, Room 204" required>
+            </div>
+            <div class="field">
+              <label for="issuePriority">Urgency Priority</label>
+              <select id="issuePriority">
+                <option value="Low">Low (Minor)</option>
+                <option value="Medium" selected>Medium (Standard)</option>
+                <option value="High">High (Immediate Action)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="issueReporter">Reported By</label>
+              <input id="issueReporter" placeholder="Your name or Student ID (optional)">
+            </div>
+            <div class="field full">
+              <label for="issueDesc">Description & Details</label>
+              <textarea id="issueDesc" rows="2" placeholder="Provide details (e.g. AC running after hours, tap won't shut off completely)..."></textarea>
+            </div>
+          </div>
+          <div style="margin-top:14px; display:flex; gap:10px">
+            <button class="btn btn-primary" type="submit">🚨 Submit Incident Report</button>
+            <button class="btn btn-ghost" type="reset">Clear Form</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Campus Incident Tickets</h3>
+        <p class="card-desc">Track active reports and update status when fixed.</p>
+        <div class="issues-grid" id="issuesList"></div>
+      </div>
+    </section>
+
+    <!-- ── 4. AI Insights Page ─────────────────────────── -->
+    <section class="page" id="page-insights">
+      <div class="card">
+        <div class="card-header-flex">
+          <div>
+            <h3>🤖 AI Eco-Advisor & Anomaly Detection</h3>
+            <p class="card-desc">Continuous algorithmic analysis of campus utility readings, waste patterns, and cost-saving opportunities.</p>
+          </div>
+          <span class="badge badge-Resolved">Model Online</span>
+        </div>
+        <div class="insights-grid" id="insightsList"></div>
+      </div>
+    </section>
+
+    <!-- ── 5. Log Resources Page ───────────────────────── -->
+    <section class="page" id="page-log">
+      <div class="grid-2">
+        <div class="card">
+          <h3>Log Campus Resource Reading</h3>
+          <p class="card-desc">Submit sub-meter measurements or recycling batch records.</p>
+          <form id="resourceForm">
+            <div class="form-grid">
+              <div class="field">
+                <label for="resource">Resource Category</label>
+                <select id="resource">
+                  <option value="electricity">⚡ Electricity consumed</option>
+                  <option value="water">💧 Water consumed</option>
+                  <option value="paper">📄 Paper consumed</option>
+                  <option value="waste">♻️ Waste recycled</option>
+                  <option value="generalWaste">🗑 General waste generated</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="amount">Quantity</label>
+                <input id="amount" type="number" min="0.01" max="10000000" step="any" placeholder="e.g. 45" required>
+              </div>
+              <div class="field">
+                <label for="unit">Unit</label>
+                <select id="unit"><option>kWh</option><option>L</option><option>sheets</option><option>kg</option></select>
+              </div>
+              <div class="field">
+                <label for="area">Campus Area / Room</label>
+                <input id="area" maxlength="70" placeholder="e.g. Computer Lab 2" required>
+              </div>
+              <div class="field">
+                <label for="date">Date of Reading</label>
+                <input id="date" type="date" required>
+              </div>
+              <div class="field">
+                <label for="reporter">Logged By</label>
+                <input id="reporter" maxlength="50" placeholder="e.g. Green Club Member">
+              </div>
+              <div class="field full">
+                <label for="note">Notes / Activity Context</label>
+                <input id="note" maxlength="160" placeholder="e.g. AC shut down audit or recycling drive">
+              </div>
+            </div>
+            <div style="margin-top:16px; display:flex; gap:10px">
+              <button class="btn btn-primary" type="submit">💾 Save Resource Entry</button>
+              <button class="btn btn-ghost" type="reset">Clear Form</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>IoT Telemetry Integration</h3>
+          <p class="card-desc">Direct Webhook endpoint for smart meters & microcontrollers.</p>
+          <div style="background:var(--bg); padding:14px; border-radius:var(--radius-sm); font-family:monospace; font-size:12px; margin:14px 0; line-height:1.5">
+            POST /api/sensors/ingest<br>
+            Content-Type: application/json<br><br>
+            {<br>
+            &nbsp;&nbsp;"sensor_id": "METER-04",<br>
+            &nbsp;&nbsp;"resource": "electricity",<br>
+            &nbsp;&nbsp;"amount": 14.5,<br>
+            &nbsp;&nbsp;"unit": "kWh",<br>
+            &nbsp;&nbsp;"area": "Auditorium"<br>
+            }
+          </div>
+          <button class="btn btn-soft" id="btnTestIot">⚡ Send Sample IoT Ping Now</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 6. Activity Records Page ────────────────────── -->
+    <section class="page" id="page-records">
+      <div class="card">
+        <div class="card-header-flex">
+          <div>
+            <h3>Activity Records</h3>
+            <p class="card-desc">All historical measurements stored in backend database.</p>
+          </div>
+        </div>
+        
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <input class="filter-input" id="searchFilter" placeholder="🔍 Search area or note...">
+          <select class="filter-input" id="resourceFilter">
+            <option value="all">All Resources</option>
+            <option value="electricity">⚡ Electricity</option>
+            <option value="water">💧 Water</option>
+            <option value="paper">📄 Paper</option>
+            <option value="waste">♻️ Waste</option>
+          </select>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Resource</th><th>Quantity</th><th>Area</th><th>Logged by</th><th>Note</th><th>Actions</th></tr></thead>
+            <tbody id="recordsBody"></tbody>
+          </table>
+        </div>
+        <div id="empty" style="text-align:center; padding:30px; color:var(--muted); display:none">No matching entries found.</div>
+      </div>
+    </section>
+
+    <!-- ── 7. Green Actions Page ───────────────────────── -->
+    <section class="page" id="page-actions">
+      <div class="card">
+        <h3>Campus Green Action Checklist</h3>
+        <p class="card-desc">High-impact daily and weekly habits to cut utility waste.</p>
+        <div class="challenges" id="challenges"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '';
+const labels = {electricity:'Electricity', water:'Water', paper:'Paper', waste:'Waste recycled', generalWaste:'General waste'};
+const units = {electricity:'kWh', water:'L', paper:'sheets', waste:'kg', generalWaste:'kg'};
+const targets = {electricity:300, water:1800, paper:500, waste:40, generalWaste:35};
+const icons = {electricity:'⚡', water:'💧', paper:'📄', waste:'♻️', generalWaste:'🗑️'};
+const actionData = [
+  ['Switch off empty-room lights','Turn off lights, fans, and projectors after each lecture.','Electricity savings'],
+  ['Report leaking taps & flushes','Notify maintenance immediately when a washroom tap drips.','Water conservation'],
+  ['Adopt double-sided printing & digital notes','Submit and grade assignments electronically.','Paper reduction'],
+  ['Segregate campus cafeteria waste','Ensure compostable food waste is kept free of single-use plastics.','Circular recycling'],
+  ['5-minute end-of-day lab power check','Verify computers, soldering irons, and ACs are shut down at 6 PM.','Idle power cutoff']
+];
+const emojis = ['💡','🚰','📱','♻️','🔌'];
+
+let entries = [];
+let completed = [];
+let issues = [];
+let leaderboard = [];
+let insights = [];
+
+const $ = id => document.getElementById(id);
+
+// ── API Helpers ───────────────────────────────────────────────────────
+async function apiGet(path) {
+  const res = await fetch(API + path);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+async function apiPost(path, body) {
+  const res = await fetch(API + path, {
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({error:'Request failed'}));
+    throw new Error(err.error || 'Request failed');
+  }
+  return res.json();
+}
+async function apiDelete(path) {
+  const res = await fetch(API + path, {method:'DELETE'});
+  if (!res.ok) throw new Error('Delete failed');
+  return res.json();
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────
+function toast(msg) {
+  $('toast').textContent = msg;
+  $('toast').classList.add('show');
+  setTimeout(() => $('toast').classList.remove('show'), 2600);
+}
+
+// ── Load All Data ─────────────────────────────────────────────────────
+async function loadAll() {
+  try {
+    const [ent, act, iss, lb, ins] = await Promise.all([
+      apiGet('/api/entries'),
+      apiGet('/api/actions'),
+      apiGet('/api/issues'),
+      apiGet('/api/leaderboard'),
+      apiGet('/api/insights')
+    ]);
+    entries = ent;
+    completed = act;
+    issues = iss;
+    leaderboard = lb;
+    insights = ins;
+    renderAll();
+  } catch (err) {
+    console.error('Data load error:', err);
+    toast('⚠ Backend connection notice: ' + err.message);
+  }
+}
+
+// ── Render Everything ─────────────────────────────────────────────────
+function renderAll() {
+  renderOverview();
+  renderLeaderboard();
+  renderIssues();
+  renderInsights();
+  renderRecords();
+  renderActions();
+}
+
+function renderOverview() {
+  let t = {electricity:0, water:0, paper:0, waste:0};
+  entries.forEach(e => { if (t[e.resource] !== undefined) t[e.resource] += Number(e.amount)||0; });
+
+  $('electric').innerHTML = t.electricity.toLocaleString(undefined,{maximumFractionDigits:1}) + ' <small>kWh</small>';
+  $('water').innerHTML = t.water.toLocaleString(undefined,{maximumFractionDigits:1}) + ' <small>L</small>';
+  $('paper').innerHTML = t.paper.toLocaleString(undefined,{maximumFractionDigits:1}) + ' <small>sheets</small>';
+  $('waste').innerHTML = t.waste.toLocaleString(undefined,{maximumFractionDigits:1}) + ' <small>kg</small>';
+  $('entryCount').textContent = entries.length + ' entries recorded';
+
+  // Breakdown
+  $('breakdown').innerHTML = Object.keys(targets).slice(0,4).map(k => {
+    let val = t[k]||0, p = Math.min(100, val/targets[k]*100);
+    return `<div class="resource-row">
+      <div style="font-size:20px">${icons[k]}</div>
+      <div>
+        <div style="font-weight:600; font-size:13px">${labels[k]}</div>
+        <div style="font-size:11px; color:var(--muted)">${val.toLocaleString()} ${units[k]} · target ${targets[k]}</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${p}%"></div></div>
+      </div>
+      <b style="font-size:12.5px">${Math.round(p)}%</b>
+    </div>`;
+  }).join('');
+
+  // Chart
+  let electricity = entries.filter(e => e.resource === 'electricity').slice(-7);
+  if (!electricity.length) electricity = [{amount:0,date:'Mon'},{amount:0,date:'Tue'},{amount:0,date:'Wed'}];
+  const max = Math.max(1, ...electricity.map(e => Number(e.amount)));
+  $('chart').innerHTML = electricity.map(e => `
+    <div class="chart-col">
+      <div class="chart-bar" style="height:${Math.max(6, Number(e.amount)/max*140)}px">
+        <div class="tooltip">${e.amount} kWh (${esc(e.area)})</div>
+      </div>
+      <div class="chart-label">${e.is_demo ? 'Demo' : e.date.slice(5)}</div>
+    </div>
+  `).join('');
+
+  // Actions Preview
+  $('actionPreview').innerHTML = actionData.slice(0,3).map((a,i) => `
+    <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line)">
+      <input type="checkbox" data-action="${i}" ${completed.includes(i)?'checked':''}>
+      <div style="font-size:13px"><b>${a[0]}</b><div style="font-size:11px; color:var(--muted)">${a[1]}</div></div>
+    </div>
+  `).join('');
+
+  // Environmental Wins Model
+  let avoided = completed.length * 2.48;
+  $('co2').textContent = avoided.toFixed(1) + ' kg CO₂';
+  $('money').textContent = '₹' + (completed.length * 84).toLocaleString();
+  $('doneCount').textContent = completed.length + ' / ' + actionData.length;
+}
+
+function renderLeaderboard() {
+  $('leaderboardList').innerHTML = leaderboard.map(l => `
+    <div class="leader-item">
+      <div class="leader-rank">${l.rank}</div>
+      <div class="leader-info">
+        <div class="leader-name">${esc(l.department)} <span style="font-size:11px; color:var(--muted)">(${esc(l.building)})</span></div>
+        <div class="leader-sub">Efficiency Rating: <b>${l.efficiency}</b> · Estimated CO₂ Saved: <b>${l.co2_saved_kg} kg</b></div>
+      </div>
+      <div class="leader-points">
+        <div class="leader-pts-val">${l.points} pts</div>
+        <div class="leader-badge">${l.badge}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderIssues() {
+  if (!issues.length) {
+    $('issuesList').innerHTML = '<div style="color:var(--muted); padding:20px; grid-column:1/-1; text-align:center">No active incident reports. Campus is running cleanly!</div>';
+    return;
+  }
+  $('issuesList').innerHTML = issues.map(iss => `
+    <div class="issue-card">
+      <div class="issue-header">
+        <div class="issue-title">${esc(iss.title)}</div>
+        <span class="badge badge-${iss.status.replace(' ','_')}">${iss.status}</span>
+      </div>
+      <div class="issue-meta">📍 ${esc(iss.area)} · Priority: <b>${iss.priority}</b> · By: ${esc(iss.reporter)}</div>
+      <div class="issue-desc">${esc(iss.description || 'No additional note.')}</div>
+      <div class="issue-actions">
+        ${iss.status !== 'Resolved' ? `<button class="btn btn-soft" data-iss-status="${iss.id}" data-new-status="Resolved">✓ Mark Resolved</button>` : ''}
+        ${iss.status === 'Reported' ? `<button class="btn btn-ghost" data-iss-status="${iss.id}" data-new-status="In Progress">⚡ Take Up (In Progress)</button>` : ''}
+        <button class="btn btn-danger" data-iss-del="${iss.id}">✕ Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderInsights() {
+  // 1. Populate the full grid in the dedicated AI Eco-Advisor tab
+  const insightsListEl = $('insightsList');
+  if (insightsListEl) {
+    insightsListEl.innerHTML = insights.map(ins => `
+      <div class="insight-card ${ins.type}">
+        <div class="insight-tag">${esc(ins.category)}</div>
+        <h4>${esc(ins.title)}</h4>
+        <p>${esc(ins.detail)}</p>
+        <div class="insight-footer">
+          <div class="insight-saving">Savings: ${esc(ins.saving)}</div>
+          <div class="insight-impact">${esc(ins.impact)}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // 2. Filter actionable warnings / alerts for the main Overview Dashboard
+  const activeAlerts = insights.filter(i => i.type === 'warning' || i.type === 'alert');
+  const alertCard = $('dashboardAlertsCard');
+  const alertList = $('dashboardAlertsList');
+  const badge = $('alertsBadge');
+
+  if (badge) {
+    if (activeAlerts.length > 0) {
+      badge.textContent = activeAlerts.length;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  if (alertCard && alertList) {
+    if (activeAlerts.length > 0) {
+      alertCard.style.display = 'block';
+      alertList.innerHTML = activeAlerts.map(a => `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg); padding:10px 14px; border-radius:var(--radius-sm); border:1px solid var(--line); flex-wrap:wrap; gap:8px;">
+          <div>
+            <span style="font-size:11px; font-weight:700; color:${a.type === 'alert' ? 'var(--danger)' : 'var(--warn)'}; text-transform:uppercase;">${esc(a.category)}</span>
+            <div style="font-size:13.5px; font-weight:600; margin-top:2px;">${esc(a.title)}</div>
+            <div style="font-size:12px; color:var(--muted);">${esc(a.detail)}</div>
+          </div>
+          <div style="text-align:right; min-width:110px;">
+            <div style="font-size:12.5px; font-weight:700; color:var(--pri);">${esc(a.saving)}</div>
+            <div style="font-size:11px; color:var(--muted);">${esc(a.impact)}</div>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      alertCard.style.display = 'none';
+    }
+  }
+}
+
+function getLocalDate() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function renderRecords() {
+  const search = $('searchFilter') ? $('searchFilter').value.toLowerCase().trim() : '';
+  const filter = $('resourceFilter') ? $('resourceFilter').value : 'all';
+
+  const filtered = entries.filter(e => {
+    const matchRes = filter === 'all' || e.resource === filter;
+    const areaStr = (e.area || '').toLowerCase();
+    const noteStr = (e.note || '').toLowerCase();
+    const reporterStr = (e.reporter || '').toLowerCase();
+    const matchSearch = !search || areaStr.includes(search) || noteStr.includes(search) || reporterStr.includes(search);
+    return matchRes && matchSearch;
+  });
+
+  $('recordsBody').innerHTML = filtered.map(e => `
+    <tr>
+      <td>${esc(e.date)}</td>
+      <td>${icons[e.resource]||''} ${esc(labels[e.resource]||e.resource)}</td>
+      <td><b>${esc(e.amount)}</b> ${esc(e.unit)}</td>
+      <td>${esc(e.area)}</td>
+      <td>${esc(e.reporter||'—')}</td>
+      <td>${esc(e.note||'—')}${e.is_demo?' <span style="opacity:.5">(demo)</span>':''}</td>
+      <td><button class="btn btn-danger" data-delete="${e.id}" title="Delete entry">✕</button></td>
+    </tr>
+  `).join('');
+
+  $('empty').style.display = filtered.length ? 'none' : 'block';
+}
+
+function renderActions() {
+  $('challenges').innerHTML = actionData.map((a,i) => `
+    <div class="challenge-card">
+      <div style="font-size:10px; font-weight:700; color:var(--pri); margin-bottom:6px">ACTION ${i+1}</div>
+      <div style="font-size:28px; margin-bottom:8px">${emojis[i]}</div>
+      <h4 style="font-size:14px; margin-bottom:4px">${esc(a[0])}</h4>
+      <p style="font-size:12px; color:var(--muted); min-height:36px; margin-bottom:12px">${esc(a[1])}</p>
+      <button class="btn ${completed.includes(i)?'btn-soft':'btn-primary'}" data-complete="${i}">
+        ${completed.includes(i)?'✓ Completed':'Mark Complete'}
+      </button>
+    </div>
+  `).join('');
+}
+
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// ── Navigation ────────────────────────────────────────────────────────
+function go(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  $('page-' + page).classList.add('active');
+  document.querySelectorAll('[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+
+  const titles = {
+    dashboard: ['CAMPUS IMPACT CENTER', 'Good morning, changemaker.', 'Live campus sustainability metrics & audits.'],
+    leaderboard: ['INTER-FACULTY COMPETITION', 'Sustainability Leaderboard', 'Real-time standings across departments & residences.'],
+    issues: ['CAMPUS HAZARD DESK', 'Incident & Leak Management', 'Report water leaks, idle electronics, and track ticket status.'],
+    insights: ['DATA-DRIVEN RECOMMENDATIONS', 'AI Eco-Advisor & Anomaly Alerts', 'Algorithmic resource optimization opportunities.'],
+    log: ['DATA INGESTION', 'Log Resource Measurements', 'Submit manual sub-meter values or send IoT sensor streams.'],
+    records: ['HISTORICAL AUDIT', 'Campus Activity Records', 'Search, filter, and inspect verified consumption entries.'],
+    actions: ['BEHAVIORAL HABITS', 'Green Action Checklist', 'Check off daily habits to reduce campus footprint.']
+  };
+
+  if (titles[page]) {
+    $('eyebrow').textContent = titles[page][0];
+    $('title').textContent = titles[page][1];
+    $('subtitle').textContent = titles[page][2];
+  }
+  $('sidebar').classList.remove('open');
+}
+
+// ── Event Listeners ───────────────────────────────────────────────────
+document.querySelectorAll('[data-page]').forEach(b => b.addEventListener('click', () => go(b.dataset.page)));
+document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => go(b.dataset.goto)));
+$('menuToggle').addEventListener('click', () => $('sidebar').classList.toggle('open'));
+
+// Theme toggle & persistence
+$('themeToggle').addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  const nxt = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', nxt);
+  localStorage.setItem('ecocampus_theme', nxt);
+  $('themeToggle').textContent = nxt === 'dark' ? '☀️' : '🌙';
+});
+const savedTheme = localStorage.getItem('ecocampus_theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+$('themeToggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+// Unit sync & local date initialization
+$('date').value = getLocalDate();
+$('resource').addEventListener('change', () => { $('unit').value = units[$('resource').value] || 'kg'; });
+
+// Form: Resource entry
+$('resourceForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const resource = $('resource').value;
+  const amount = Number($('amount').value);
+  const area = $('area').value.trim();
+  if (!(amount > 0) || !area) { toast('Enter quantity > 0 and campus area.'); return; }
+  try {
+    await apiPost('/api/entries', {
+      resource, amount, unit:$('unit').value, area,
+      date:$('date').value, reporter:$('reporter').value.trim(), note:$('note').value.trim()
+    });
+    await loadAll();
+    e.target.reset();
+    $('date').value = getLocalDate();
+    $('unit').value = units[$('resource').value] || 'kWh';
+    go('dashboard');
+    toast('✅ Resource reading saved to database.');
+  } catch (err) { toast('⚠ ' + err.message); }
+});
+
+// Form: Issue incident
+$('issueForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const title = $('issueTitle').value.trim();
+  const category = $('issueCategory').value;
+  const area = $('issueArea').value.trim();
+  const priority = $('issuePriority').value;
+  const reporter = $('issueReporter').value.trim() || 'Student Volunteer';
+  const description = $('issueDesc').value.trim();
+
+  if (!title || !area) {
+    toast('⚠ Title and campus location are required.');
+    return;
+  }
+
+  try {
+    await apiPost('/api/issues', { title, category, area, priority, reporter, description });
+    await loadAll();
+    e.target.reset();
+    toast('🚨 Incident reported! Maintenance team alerted.');
+  } catch (err) { toast('⚠ ' + err.message); }
+});
+
+// Delegated click handling using .closest() for reliability across nested nodes
+document.addEventListener('click', async e => {
+  const statusBtn = e.target.closest('[data-iss-status]');
+  if (statusBtn) {
+    const id = statusBtn.dataset.issStatus;
+    const status = statusBtn.dataset.newStatus;
+    try {
+      await apiPost(`/api/issues/${id}/status`, { status });
+      await loadAll();
+      toast(`Issue marked as ${status}.`);
+    } catch (err) { toast('⚠ ' + err.message); }
+    return;
+  }
+
+  const issueDelBtn = e.target.closest('[data-iss-del]');
+  if (issueDelBtn) {
+    try {
+      await apiDelete(`/api/issues/${issueDelBtn.dataset.issDel}`);
+      await loadAll();
+      toast('Issue deleted.');
+    } catch (err) { toast('⚠ ' + err.message); }
+    return;
+  }
+
+  const entryDelBtn = e.target.closest('[data-delete]');
+  if (entryDelBtn) {
+    try {
+      await apiDelete(`/api/entries/${entryDelBtn.dataset.delete}`);
+      await loadAll();
+      toast('Entry deleted.');
+    } catch (err) { toast('⚠ ' + err.message); }
+    return;
+  }
+
+  const completeBtn = e.target.closest('[data-complete]');
+  if (completeBtn) {
+    const i = Number(completeBtn.dataset.complete);
+    try {
+      await apiPost('/api/actions', { action_idx: i, completed: !completed.includes(i) });
+      await loadAll();
+      toast('Green action checklist updated.');
+    } catch (err) { toast('⚠ ' + err.message); }
+    return;
+  }
+});
+
+// Checklist checkboxes
+document.addEventListener('change', async e => {
+  if (e.target.matches('[data-action]')) {
+    const i = Number(e.target.dataset.action);
+    try {
+      await apiPost('/api/actions', { action_idx: i, completed: e.target.checked });
+      await loadAll();
+      toast('Action checklist updated.');
+    } catch (err) { toast('⚠ ' + err.message); }
+  }
+});
+
+// Search & filters
+$('searchFilter').addEventListener('input', renderRecords);
+$('resourceFilter').addEventListener('change', renderRecords);
+
+// Print / PDF Report
+$('printReport').addEventListener('click', () => { window.print(); });
+
+// IoT Telemetry Simulation
+async function triggerIotPing() {
+  const rooms = ['Computer Lab 1', 'Mechanical Workshop', 'Main Library', 'Seminar Hall A'];
+  const room = rooms[Math.floor(Math.random() * rooms.length)];
+  const val = +(Math.random() * 8 + 3).toFixed(2);
+  try {
+    await apiPost('/api/sensors/ingest', {
+      sensor_id: 'ESP32-' + Math.floor(Math.random()*900 + 100),
+      resource: 'electricity',
+      amount: val,
+      unit: 'kWh',
+      area: room
+    });
+    await loadAll();
+    toast(`📡 IoT telemetry received: ${val} kWh recorded for ${room}!`);
+  } catch (err) { toast('⚠ ' + err.message); }
+}
+$('simulateIot').addEventListener('click', triggerIotPing);
+$('btnTestIot').addEventListener('click', triggerIotPing);
+
+// CSV Export
+$('export').addEventListener('click', () => { window.location.href = API + '/api/export'; });
+
+// ── Startup ───────────────────────────────────────────────────────────
+loadAll();
+</script>
+</body>
+</html>
