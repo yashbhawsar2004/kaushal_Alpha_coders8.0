@@ -1,6 +1,6 @@
 # 🌿 EcoCampus – Smart Campus Sustainability Platform
 
-> An intelligent, full-stack campus sustainability platform that tracks utility consumption, crowdsources environmental incident reports, gamifies inter-departmental conservation, ingests IoT telemetry, and delivers algorithmic eco-advisory insights to minimize institutional carbon footprints.
+> An intelligent, full-stack campus sustainability platform that tracks utility consumption, crowdsources environmental incident reports, gamifies inter-departmental conservation, simulates IoT telemetry through an administrator-only dashboard, and delivers algorithmic eco-advisory insights to minimize institutional carbon footprints.
 
 [![Python Version](https://img.shields.io/badge/Python-3.9+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![Flask Version](https://img.shields.io/badge/Flask-3.1.1-000000?style=flat&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
@@ -42,7 +42,7 @@ Educational institutions, university colleges, and corporate campuses consume ma
 
 ### Proposed Solution
 **EcoCampus** is a centralized, lightweight, and deployment-ready sustainability platform designed to bridge the gap between facilities management and campus occupants. It offers:
-1. **Centralized Utility Ledger:** Manual sub-meter logging and automated IoT sensor ingestion for electricity, water, paper, and waste.
+1. **Centralized Utility Ledger:** Manual sub-meter logging and administrator-triggered IoT telemetry simulation for electricity, water, paper, and waste.
 2. **Crowdsourced Maintenance Ticketing:** Student and staff reporting desk to track facilities leaks and equipment idle-run from report to resolution.
 3. **Gamified Inter-Faculty Competition:** Dynamic leaderboards ranking faculties, departments, and residential hostels with verified eco-points.
 4. **Algorithmic AI Eco-Advisor:** Real-time heuristic consumption analysis detecting usage spikes, computing potential financial savings in Rupees (**₹**), and estimating avoided carbon dioxide emissions (**kg CO₂**).
@@ -87,8 +87,8 @@ Educational institutions, university colleges, and corporate campuses consume ma
 
 ### Production WSGI & Containerization
 - **Windows Production Server:** [Waitress 3.0.2](https://pypi.org/project/waitress/) (multi-threaded, production-grade WSGI server).
-- **Linux / Cloud WSGI:** [Gunicorn 23.0.0](https://gunicorn.org/) (`--workers 2 --threads 4`).
-- **Containerization:** Docker multi-stage build on `python:3.11-slim` with unprivileged non-root execution (`appuser`) and container healthcheck probes.
+- **Linux / Cloud WSGI:** [Gunicorn 23.0.0](https://gunicorn.org/) (Render should use one worker with four threads for SQLite startup).
+- **Containerization:** Docker build on `python:3.11-slim` with unprivileged non-root execution (`appuser`) and container healthcheck probes.
 - **PaaS Deployments:** Configured for [Render](https://render.com) (`render.yaml`) and [Railway](https://railway.app) (`Procfile`).
 
 ---
@@ -506,7 +506,7 @@ Limit updates require an authenticated administrator session and a CSRF token. R
 The optional `MONITORING_BASELINE_LIMITS` environment variable accepts a JSON object such as `{"electricity":400,"water":2000}`. Limits use the unit stored with that resource (for example, kWh, L, sheets, or kg). `MONITORING_UNDER_USAGE_RATIO` sets the default under-usage fraction for scopes without a saved override.
 
 ### 1. Departmental Leaderboard Scoring Algorithm
-Rankings are computed dynamically in [database.py](file:///d:/kaushal/ecocampus_mvp/database.py#L287-L340) using the verified formula:
+Rankings are computed dynamically in [`database.py`](./database.py) using the verified formula:
 
 $$\text{Points} = \text{Base Score} + (\text{Completed Actions} \times 15) + (\text{Resolved Tickets} \times 20) + (\text{Total Audits} \times 5)$$
 
@@ -553,7 +553,7 @@ Checks database schema creation, CRUD operations, health endpoints, IoT ingestio
 ```bash
 python -m unittest test_ecocampus.py -v
 ```
-Runs the comprehensive integration tests using an isolated temporary SQLite database, including monitoring arithmetic, threshold transitions, zero/missing/stale readings, period grouping, and admin-key validation.
+Runs the comprehensive integration tests using an isolated temporary SQLite database, including monitoring arithmetic, threshold transitions, zero/missing/stale readings, period grouping, account roles, CSRF, and authorization.
 
 ### Common Troubleshooting Scenarios
 
@@ -578,7 +578,7 @@ Runs the comprehensive integration tests using an isolated temporary SQLite data
 | `DATABASE_PATH` | `ecocampus.db` | Absolute or relative path to the SQLite database file |
 | `CORS_ORIGINS` | `*` | Allowed CORS origins for external API clients |
 | `BOOTSTRAP_ADMIN_USERNAME` | unset | Username for the first administrator account |
-| `BOOTSTRAP_ADMIN_PASSWORD` | unset | Server-side bootstrap password; 1-8 characters |
+| `BOOTSTRAP_ADMIN_PASSWORD` | unset | Server-side bootstrap password; 1-8 characters (weak; avoid public deployment) |
 | `SESSION_SECRET_KEY` | DB-generated | Stable session-signing secret; configure explicitly for multi-instance deployments |
 | `SESSION_COOKIE_SECURE` | `0` | Set to `1` when serving over HTTPS |
 | `MONITORING_LIMIT_MULTIPLIER` | `1.5` | Derived maximum as a multiple of the historical average; must be greater than 0 and at most 10 |
@@ -587,7 +587,7 @@ Runs the comprehensive integration tests using an isolated temporary SQLite data
 
 ### Security Hardening Measures
 1. **OWASP / CWE-1236 Formula Injection Sanitization:**
-   In [server.py](file:///d:/kaushal/ecocampus_mvp/server.py#L369-L378), all text exported to CSV is evaluated through `sanitize_csv_cell()`. If an entry string begins with spreadsheet formula operators (`=`, `+`, `-`, `@`, `\t`, `\r`), a leading single quote (`'`) is prepended to neutralize formula execution in Microsoft Excel and LibreOffice Calc.
+   In [`server.py`](./server.py), all text exported to CSV is evaluated through `sanitize_csv_cell()`. If an entry string begins with spreadsheet formula operators (`=`, `+`, `-`, `@`, `\t`, `\r`), a leading single quote (`'`) is prepended to neutralize formula execution in Microsoft Excel and LibreOffice Calc.
 2. **Security HTTP Response Headers:**
    Every HTTP response applies:
    - `X-Content-Type-Options: nosniff`
@@ -618,13 +618,29 @@ docker run -d -p 5501:5501 -v ecocampus_data:/app ecocampus:latest
 
 The Docker container runs with an unprivileged `appuser` (UID 1000) and includes an automatic Docker `HEALTHCHECK` probing `http://localhost:5501/health`.
 
-### Option 2: Render 1-Click Deployment
-1. Push your repository to GitHub or GitLab.
-2. Log into [Render.com](https://render.com) and click **New +** ➔ **Blueprint**.
-3. Select your repository. Render reads [render.yaml](file:///d:/kaushal/ecocampus_mvp/render.yaml) automatically:
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --threads 4`
-   - Health Check Path: `/health`
+### Option 2: Render Web Service Deployment
+1. Push the project to GitHub. Do not commit `.env`; configure secrets in Render instead.
+2. In [Render](https://dashboard.render.com/), choose **New + → Web Service**, connect GitHub, and select the repository.
+3. Because the repository contains a `Dockerfile`, use the Docker runtime. For a repository-root deployment, set **Dockerfile Path** to `./Dockerfile` and **Docker Build Context Directory** to `.`. Leave Registry Credential and Pre-Deploy Command blank.
+4. Set **Docker Command** to:
+   ```text
+   gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 60
+   ```
+   A single worker avoids concurrent SQLite initialization collisions; the four threads still handle concurrent requests.
+5. Add these service environment variables:
+
+   | Key | Value |
+   |---|---|
+   | `BOOTSTRAP_ADMIN_USERNAME` | Administrator username, e.g. `admin` |
+   | `BOOTSTRAP_ADMIN_PASSWORD` | Administrator password; current application limit is 1-8 characters (weak for a public service) |
+   | `SESSION_SECRET_KEY` | Long random secret generated privately; keep it out of source control |
+   | `SESSION_COOKIE_SECURE` | `1` |
+
+   Render supplies `PORT`; do not set it manually. Do not upload `.env`. Auto-Deploy may remain enabled; Build Filters and Pre-Deploy Command can stay at their defaults/blank.
+6. Create the service and wait for deployment. Check the service logs for Gunicorn startup, then visit `https://<service-name>.onrender.com/health`; the health endpoint should report `healthy`.
+7. SQLite data on an ephemeral instance may be lost when Render replaces or restarts it. If the plan supports a persistent disk, attach it at `/var/data` and set `DATABASE_PATH=/var/data/ecocampus.db`. Keep SQLite on a single service instance; do not scale multiple instances against a local SQLite database.
+
+If using **Blueprint** instead of Web Service, Render reads [`render.yaml`](./render.yaml). Review the command configured there and set the single-worker Docker/Gunicorn command above in the service settings when applicable.
 
 ### Option 3: Windows Server Deployment (Waitress)
 For native Windows production servers without Docker:
@@ -637,7 +653,7 @@ python -m waitress --listen=0.0.0.0:5501 wsgi:app
 
 ## 13. Future Roadmap
 
-- [ ] **MQTT Telemetry Broker:** Ingest smart sub-meter packets directly via an embedded Mosquitto MQTT broker in addition to HTTP webhooks.
+- [ ] **MQTT Telemetry Broker:** Add direct broker integration for campus smart sub-meters; the current dashboard sensor simulator does not accept external device/API-key ingestion.
 - [ ] **Predictive Machine Learning Forecasting:** Integrate an autoregressive time-series model (e.g. Prophet or ARIMA) to predict next-month power demands based on academic calendar dates.
 - [x] **Role-Based Authentication (RBAC):** Server-enforced administrator, department-manager, and user accounts with separate panels, scoped access, and audit logging.
 - [ ] **Automated Facilities Dispatch:** Webhook integration with Slack, Microsoft Teams, or WhatsApp Business API to alert maintenance engineers immediately when a `High` priority leak is logged.
@@ -679,10 +695,9 @@ When demonstrating or evaluating the EcoCampus platform, follow this walkthrough
 3. **Resilient Security Defaults:** Defensive practices such as OWASP CSV injection escaping, finite numerical validation, and HTTP security response headers are built into the core API layer rather than treated as afterthoughts.
 
 ### Honest Limitations & Areas for Improvement
-The old external-API-ingestion note below is obsolete: sensor ingestion is restricted to the administrator's signed-in session and does not use API keys.
 1. **Heuristic AI vs. Deep Learning:** The current "AI Advisor" uses deterministic threshold rules. While highly reliable, predictable, and cost-free, institutions with years of historical telemetry would benefit from machine learning regression models for weather-normalized anomaly detection.
 2. **Single Database Concurrency Limits:** While SQLite WAL mode easily handles tens of thousands of daily readings, an enterprise deployment spanning 50+ campuses with hundreds of continuous IoT telemetry sensors should transition to **PostgreSQL** or **TimescaleDB** using SQLAlchemy.
-3. **Open API Ingestion:** Currently, `/api/sensors/ingest` validates payload structure but does not enforce API token authentication (`Bearer <API_KEY>`). In production hardware deployments, an API key or HMAC signature header should be enforced.
+3. **External IoT Ingestion:** The sensor simulator is restricted to signed-in administrators. Direct hardware ingestion is not enabled; adding it requires a separate device-authentication design.
 
 ---
 
