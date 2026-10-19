@@ -9,6 +9,7 @@
 <style>
 /* ── Design Tokens ─────────────────────────────────────────────── */
 :root {
+  color-scheme: light;
   --pri: #16a34a; --pri-dark: #15803d; --pri-light: #dcfce7;
   --accent: #059669; --accent2: #0d9488; --warn: #b45309; --danger: #dc2626; --info: #2563eb;
   --bg: #f3f9f4; --bg2: #ffffff; --surface: #ffffff;
@@ -21,6 +22,7 @@
   --sidebar-w: 260px;
 }
 [data-theme="dark"] {
+  color-scheme: dark;
   --bg: #09150e; --bg2: #0f2217; --surface: #132a1d;
   --text: #e8f5e9; --text2: #a5d6a7; --muted: #86a290;
   --warn: #fbbf24; --danger: #f87171; --info: #60a5fa;
@@ -44,8 +46,9 @@ button { cursor: pointer; border: 0; }
 .auth-card p { color:var(--muted); font-size:13px; line-height:1.6; margin-bottom:18px; }
 .auth-card .field { margin:12px 0; }
 .auth-switch { background:none; color:var(--pri); font-weight:700; padding:12px 0 0; }
-.user-chip { display:inline-flex; align-items:center; gap:8px; padding:7px 10px; border:1px solid var(--line); border-radius:20px; color:var(--text2); font-size:12px; }
-.nav-section-label { margin:14px 12px 4px; color:rgba(255,255,255,.5); font-size:10px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; }
+[data-theme="dark"] .auth-switch { color:#4ade80; }
+.user-chip { display:inline-flex; align-items:center; gap:8px; padding:7px 10px; border:1px solid rgba(255,255,255,.3); border-radius:20px; color:#fff; background:rgba(255,255,255,.1); font-size:12px; }
+.nav-section-label { margin:14px 12px 4px; color:rgba(255,255,255,.78); font-size:10px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; }
 [hidden] { display:none !important; }
 
 /* ── App Shell ─────────────────────────────────────────────────── */
@@ -81,8 +84,31 @@ button { cursor: pointer; border: 0; }
 .nav-btn:hover { background: rgba(255,255,255,.09); color: #fff; transform: translateX(3px); }
 .nav-btn.active { background: rgba(74,222,128,.16); color: #fff; font-weight: 600; }
 .nav-icon { font-size: 17px; width: 22px; text-align: center; }
+.nav-btn:focus-visible, .btn:focus-visible, .theme-toggle:focus-visible, .auth-switch:focus-visible,
+.filter-input:focus-visible, .field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible {
+  outline: 3px solid #15803d; outline-offset: 2px;
+}
+[data-theme="dark"] .nav-btn:focus-visible, [data-theme="dark"] .btn:focus-visible,
+[data-theme="dark"] .theme-toggle:focus-visible, [data-theme="dark"] .auth-switch:focus-visible,
+[data-theme="dark"] .filter-input:focus-visible, [data-theme="dark"] .field input:focus-visible,
+[data-theme="dark"] .field select:focus-visible, [data-theme="dark"] .field textarea:focus-visible {
+  outline-color: #86efac;
+}
 
 .side-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.1); }
+.side-footer #logoutButton {
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,.38);
+  background: rgba(255,255,255,.12); color: #fff;
+  font-weight: 700; opacity: 1;
+}
+.side-footer #logoutButton:hover {
+  background: rgba(220,38,38,.28); border-color: rgba(255,255,255,.7);
+  color: #fff; transform: translateY(-1px);
+}
+.side-footer #logoutButton:focus-visible {
+  outline: 3px solid #86efac; outline-offset: 2px;
+}
 .eco-badge {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 6px 12px; border-radius: 20px;
@@ -138,6 +164,11 @@ button { cursor: pointer; border: 0; }
 .btn-danger:hover { background: #fecaca; }
 .btn-warn { background: #fef3c7; color: #b45309; }
 .btn-success { background: #dcfce7; color: #15803d; }
+[data-theme="dark"] .btn-soft { color: #bbf7d0; }
+[data-theme="dark"] .btn-danger { background: #451a1a; color: #fecaca; }
+[data-theme="dark"] .btn-danger:hover { background: #5f2020; }
+[data-theme="dark"] .btn-warn { background: #422b08; color: #fde68a; }
+[data-theme="dark"] .btn-success { background: #14351f; color: #bbf7d0; }
 
 .theme-toggle {
   width: 40px; height: 40px; border-radius: 10px;
@@ -285,6 +316,9 @@ button { cursor: pointer; border: 0; }
 .badge-Reported { background: #fee2e2; color: #dc2626; }
 .badge-In_Progress { background: #fef3c7; color: #b45309; }
 .badge-Resolved { background: #dcfce7; color: #15803d; }
+[data-theme="dark"] .badge-Reported { background:#451a1a; color:#fecaca; }
+[data-theme="dark"] .badge-In_Progress { background:#422b08; color:#fde68a; }
+[data-theme="dark"] .badge-Resolved { background:#14351f; color:#bbf7d0; }
 .issue-meta { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
 .issue-desc { font-size: 12.5px; line-height: 1.5; color: var(--text); margin-bottom: 12px; }
 .issue-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
@@ -1597,6 +1631,9 @@ $('logoutButton').addEventListener('click', async () => {
     await apiPost('/api/auth/logout', {});
     window.history.replaceState({}, '', '/login');
     showAuthentication('You have signed out.');
+    setAuthMode(false);
+    $('loginForm').reset();
+    $('registerForm').reset();
     csrfToken = '';
   } catch (error) {
     toast('⚠ ' + error.message);

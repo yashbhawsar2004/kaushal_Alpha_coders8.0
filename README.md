@@ -239,7 +239,7 @@ Launch your web browser and open:
 
 ## 6.1 Accounts, Panels, and Permissions
 
-Open `/login` to sign in or create a standard user account. New account passwords must contain 1-8 characters; existing accounts with longer passwords can still sign in. Registration never accepts a role or department; new accounts always start as `user`. Configure `BOOTSTRAP_ADMIN_USERNAME` and a 1-8 character `BOOTSTRAP_ADMIN_PASSWORD` in the server environment to create the first administrator. Admins can promote accounts to department manager and assign the department in **Users & Roles**.
+Open `/login` to sign in or create a standard user account. Use **Sign out** in the panel sidebar to clear the session and return to the login form. New account passwords must contain 1-8 characters; existing accounts with longer passwords can still sign in. Registration never accepts a role or department; new accounts always start as `user`. Configure `BOOTSTRAP_ADMIN_USERNAME` and a 1-8 character `BOOTSTRAP_ADMIN_PASSWORD` in the server environment to create the first administrator. Admins can promote accounts to department manager and assign the department in **Users & Roles**.
 
 | Capability | Administrator | Department manager | User |
 |---|---|---|---|

@@ -141,6 +141,13 @@ class EcoCampusComprehensiveTestSuite(unittest.TestCase):
         admin_entries = self.client.get("/api/entries").get_json()
         self.assertIn(user["id"], {entry["owner_user_id"] for entry in admin_entries})
 
+    def test_sign_out_clears_session_and_requires_login_again(self):
+        response = self.client.post("/api/auth/logout")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.get_json()["ok"])
+        self.assertIsNone(self.client.get("/api/auth/me").get_json()["user"])
+        self.assertEqual(self.client.get("/api/entries").status_code, 401)
+
     def test_admin_assigns_department_manager_and_limits_visibility(self):
         user_id = db.create_user("dept.manager", "Department Manager", "manager-password-2026")
         response = self.client.patch(

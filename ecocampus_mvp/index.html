@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EcoCampus | Next-Gen Sustainability Hub</title>
 <meta name="description" content="Intelligent campus sustainability dashboard: resource metering, incident reporting, departmental leaderboards, and AI eco-advisor.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -345,6 +346,8 @@ tbody tr:hover { background: rgba(74,222,128,.05); }
   .main { padding: 0 !important; max-width: 100% !important; }
   .page { display: block !important; }
   body { background: #fff !important; color: #000 !important; font-size: 12pt; }
+}
+
 /* ── Consumption Monitoring Styles ───────────────────────────────── */
 .status-badge {
   display: inline-flex; align-items: center; gap: 5px;
@@ -1000,7 +1003,12 @@ tbody tr:hover { background: rgba(74,222,128,.05); }
               </div>
               <div class="field">
                 <label for="unit">Unit</label>
-                <select id="unit"><option>kWh</option><option>L</option><option>sheets</option><option>kg</option></select>
+                <select id="unit">
+                  <option>kWh</option>
+                  <option>L</option>
+                  <option>sheets</option>
+                  <option>kg</option>
+                </select>
               </div>
               <div class="field">
                 <label for="area">Campus Area / Room</label>
@@ -1069,7 +1077,17 @@ tbody tr:hover { background: rgba(74,222,128,.05); }
 
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Date</th><th>Resource</th><th>Quantity</th><th>Area</th><th>Logged by</th><th>Note</th><th>Actions</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Resource</th>
+                <th>Quantity</th>
+                <th>Area</th>
+                <th>Logged by</th>
+                <th>Note</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
             <tbody id="recordsBody"></tbody>
           </table>
         </div>
